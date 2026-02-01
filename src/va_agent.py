@@ -1,138 +1,100 @@
 from __future__ import annotations
 
-import re
-from typing import Dict, List, Optional, Tuple
+import json
+from typing import List, Tuple, Any
 
-from src.schema import Environment, RoomObject, StateChange
+from pydantic import BaseModel, Field
+from src.schema import Environment, StateChange
+from utils.llm_client import query_llm
+from utils.logger import get_logger
 
+logger = get_logger(__name__)
 
-POWER_ON_KEYWORDS = ["켜", "켜줘", "켜 줘", "on", "turn on", "시작"]
-POWER_OFF_KEYWORDS = ["꺼", "끄", "꺼줘", "꺼 줘", "off", "turn off", "종료"]
+# LLM이 출력할 응답 구조 정의
+class VAResponse(BaseModel):
+    response_text: str = Field(..., description="사용자에게 할 자연스러운 한국어 응답")
+    changes: List[StateChange] = Field(default_factory=list, description="기기 상태 변경 내역 리스트")
 
-PROPERTY_KEYWORDS = {
-    "brightness": ["밝기", "조도"],
-    "temperature": ["온도", "도", "난방", "냉방"],
-    "volume": ["볼륨", "음량", "소리"],
-    "channel": ["채널"],
-    "mode": ["모드", "풍량", "세기"],
-}
-
-
-def _normalize(text: str) -> str:
-    return text.lower().strip()
-
-
-def _extract_number(text: str) -> Optional[str]:
-    match = re.search(r"(-?\d+(?:\.\d+)?)", text)
-    if match:
-        return match.group(1)
-    return None
-
-
-def _iter_objects(environment: Environment) -> List[RoomObject]:
-    objects: List[RoomObject] = []
-    for _, room_objects in environment.rooms.items():
-        objects.extend(room_objects)
-    return objects
-
-
-def _find_target_object(command: str, environment: Environment) -> Optional[RoomObject]:
-    command_norm = _normalize(command)
-    candidates = []
-    for obj in _iter_objects(environment):
-        if _normalize(obj.name) in command_norm:
-            candidates.append(obj)
-
-    if candidates:
-        candidates.sort(key=lambda o: len(o.name), reverse=True)
-        return candidates[0]
-
-    # Fallbacks for common device types
-    type_hints = {
-        "조명": ["등", "조명", "라이트"],
-        "tv": ["tv", "티비", "텔레비전"],
-        "에어컨": ["에어컨", "냉방"],
-        "스피커": ["스피커", "음악", "소리"],
-        "보일러": ["보일러", "난방"],
-        "커튼": ["커튼", "블라인드"],
-    }
-
-    for obj in _iter_objects(environment):
-        for _, keywords in type_hints.items():
-            if any(k in command_norm for k in keywords):
-                if any(k in _normalize(obj.name) for k in keywords):
-                    return obj
-    return None
-
-
-def _detect_power_state(command: str) -> Optional[str]:
-    command_norm = _normalize(command)
-    if any(k in command_norm for k in POWER_ON_KEYWORDS):
-        return "on"
-    if any(k in command_norm for k in POWER_OFF_KEYWORDS):
-        return "off"
-    return None
-
-
-def _detect_property(command: str, obj: RoomObject) -> Tuple[Optional[str], Optional[str]]:
-    command_norm = _normalize(command)
-
-    power_state = _detect_power_state(command)
-    if power_state and "power" in obj.properties:
-        return "power", power_state
-
-    number = _extract_number(command_norm)
-    for prop, keywords in PROPERTY_KEYWORDS.items():
-        if prop in obj.properties and any(k in command_norm for k in keywords):
-            if number:
-                if prop == "temperature":
-                    return prop, f"{number}도"
-                if prop == "brightness":
-                    return prop, f"{number}%"
-                if prop == "volume":
-                    return prop, f"{number}"
-                return prop, number
-            # No number, still a request (e.g., "밝기 올려")
-            return prop, "조정됨"
-
-    return None, None
-
-
-def _apply_change(obj: RoomObject, prop: str, value: str) -> StateChange:
-    before = obj.properties[prop].state_value
-    obj.properties[prop].state_value = value
-    return StateChange(
-        device_name=obj.name,
-        property_name=prop,
-        before=before,
-        after=value,
-    )
-
-
-def execute_command(command: str, environment: Environment) -> Tuple[str, List[StateChange]]:
-    """Rule-based virtual assistant executor.
-
-    Returns a natural language response and list of state changes.
+def execute_command(
+    command: str, 
+    environment: Environment, 
+    model: str = "gpt-4o"
+) -> Tuple[str, List[StateChange]]:
     """
-    target = _find_target_object(command, environment)
-    if not target:
-        return "죄송해요. 어떤 기기를 조작해야 할지 모르겠어요.", []
+    LLM을 사용하여 환경(Environment)을 이해하고 명령을 수행합니다.
+    """
+    
+    # Pydantic V2/V1 호환성 처리 (한국어 깨짐 방지)
+    try:
+        env_dict = environment.model_dump()
+        env_state = json.dumps(env_dict, ensure_ascii=False, indent=2)
+    except AttributeError:
+        env_state = environment.json(ensure_ascii=False)
 
-    prop, value = _detect_property(command, target)
-    if not prop or value is None:
-        return f"죄송해요. '{target.name}'에서 어떤 설정을 바꿔야 할지 알기 어렵습니다.", []
+    system_role = "당신은 스마트홈 AI 비서입니다. 현재 집안의 기기 상태를 보고 사용자의 명령을 수행하세요."
+    
+    # [핵심 수정] JSON 출력 예시를 프롬프트에 명시적으로 추가
+    prompt = f"""
+    [현재 집안 환경 및 기기 상태]
+    {env_state}
 
-    if prop not in target.properties:
-        return f"죄송해요. '{target.name}'에는 '{prop}' 설정이 없어요.", []
+    [사용자 명령]
+    "{command}"
 
-    change = _apply_change(target, prop, value)
+    [지시사항]
+    1. 사용자의 명령을 해석하여 적절한 기기를 찾고 상태를 변경하세요.
+    2. 명령이 모호하면 되묻거나, 가장 적절한 기기를 추론하여 실행하세요.
+    3. 실행할 수 없는 명령이면 정중히 거절하세요.
+    4. **중요:** 상태 변경 시 `device_name`과 `property_name`은 위 [현재 집안 환경]에 있는 정확한 값을 써야 합니다.
+    5. 응답(response_text)은 한국어로 친절하고 자연스럽게 작성하세요.
 
-    if prop == "power":
-        if value == "on":
-            response = f"알겠습니다. {target.name}를 켰어요."
+    [출력 포맷 예시]
+    반드시 아래와 같은 JSON 구조로만 출력하세요. (Markdown 코드 블록 없이 순수 JSON만 출력)
+    
+    {{
+      "response_text": "네, 거실 조명을 켰습니다.",
+      "changes": [
+        {{
+          "device_name": "거실 조명",
+          "property_name": "power",
+          "before": "off",
+          "after": "on"
+        }}
+      ]
+    }}
+
+    만약 상태 변경이 없다면 "changes": [] 로 비워두세요.
+    """
+
+    # 2. LLM 호출
+    try:
+        # Pydantic 모델 스키마를 넘겨주지만, 프롬프트 예시가 더 강력하게 작용함
+        result = query_llm(prompt, system_role, model_schema=VAResponse, model=model)
+        parsed_result = VAResponse.parse_obj(result)
+    except Exception as e:
+        logger.error(f"VA Agent LLM Error: {e}")
+        # 에러 발생 시 프로그램이 멈추지 않고, 사용자에게 사과 후 넘어가도록 처리
+        return "죄송합니다. 잠시 시스템 오류가 있어 요청을 처리하지 못했어요.", []
+
+    # 3. 실제 Environment 객체 업데이트 (State Update)
+    applied_changes = []
+    
+    for change in parsed_result.changes:
+        target_device = None
+        # 해당 기기 찾기
+        for room_name, objects in environment.rooms.items():
+            for obj in objects:
+                if obj.name == change.device_name:
+                    target_device = obj
+                    break
+            if target_device:
+                break
+        
+        if target_device and change.property_name in target_device.properties:
+            # 상태 업데이트 적용
+            target_device.properties[change.property_name].state_value = change.after
+            applied_changes.append(change)
         else:
-            response = f"알겠습니다. {target.name}를 껐어요."
-    else:
-        response = f"알겠습니다. {target.name}의 {prop}을 {value}로 설정했어요."
+            logger.warning(f"Failed to apply change: {change.device_name}.{change.property_name} not found.")
 
-    return response, [change]
+    return parsed_result.response_text, applied_changes

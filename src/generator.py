@@ -78,7 +78,7 @@ def generate_environment(
 
 
 def generate_avatar(
-    output_path: Path = Path("data/generated/avatar_profile.json"),
+    output_path: Path,
     model: Optional[str] = None,
 ) -> Dict[str, Any]:
     system_role = (
@@ -109,8 +109,19 @@ def generate_avatar(
       }
       """.strip()
 
+    # data = query_llm(prompt, system_role, model_schema=AvatarProfile, model=model)
+    # output_path.parent.mkdir(parents=True, exist_ok=True)
+    # with output_path.open("w", encoding="utf-8") as f:
+    #     json.dump(data, f, ensure_ascii=False, indent=2)
+
+    # logger.info("Avatar profile generated at %s", output_path)
+    # return data
+
     data = query_llm(prompt, system_role, model_schema=AvatarProfile, model=model)
+    
+    # 폴더가 없으면 생성
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    
     with output_path.open("w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
