@@ -6,18 +6,13 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
-from src.schema import AvatarProfile, Environment, InteractionLog, StateChange
+from src.schema import ActionContext, AvatarProfile, Environment, InteractionLog, StateChange
 from src.va_agent import execute_command
 from utils.llm_client import query_llm
 from utils.logger import get_logger
 
 
 logger = get_logger(__name__)
-
-
-class ActionContext(BaseModel):
-    visible_action: str
-    hidden_context: str
 
 
 class CommandOutput(BaseModel):
@@ -29,19 +24,6 @@ class SelfEvaluation(BaseModel):
     self_reason: str
 
 
-SPEECH_BLOCK_KEYWORDS = [
-    "수면",
-    "잠",
-    "샤워",
-    "양치",
-    "운전",
-    "회의",
-    "통화",
-    "운동",
-    "낮잠",
-]
-
-
 def _load_json(path: Path) -> Dict[str, Any]:
     with path.open("r", encoding="utf-8") as f:
         return json.load(f)
@@ -51,10 +33,6 @@ def _save_json(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
-
-
-def _is_speakable(visible_action: str) -> bool:
-    return not any(keyword in visible_action for keyword in SPEECH_BLOCK_KEYWORDS)
 
 
 def _format_state_changes(changes: List[StateChange]) -> str:
@@ -96,11 +74,14 @@ class SimulationEngine:
 
     def run_step(self, time: str, activity: str) -> Optional[Dict[str, Any]]:
         action_context = self._generate_action_context(time, activity)
-        if not _is_speakable(action_context.visible_action):
-            logger.info("Skip step at %s due to unspeakable action", time)
+        if not action_context.needs_voice_command:
+            logger.info("Skip step at %s due to needs_voice_command=False", time)
             return None
 
-        command = self._generate_command(action_context.hidden_context, action_context.visible_action)
+        command = self._generate_command(
+            action_context.hidden_context,
+            action_context.visible_action,
+        )
         response, state_changes = execute_command(command, self.environment)
 
         evaluation = self._self_evaluate(
@@ -124,19 +105,25 @@ class SimulationEngine:
         return log.dict()
 
     def _generate_action_context(self, time: str, activity: str) -> ActionContext:
-        system_role = "당신은 한국어로 시뮬레이션 데이터를 생성합니다. 반드시 JSON만 출력하세요."
+        system_role = (
+            "당신은 한국어로 시뮬레이션 데이터를 생성합니다. "
+            "모든 묘사와 대사는 한국어로 출력하세요. 반드시 JSON만 출력하세요."
+        )
         prompt = f"""
 현재 시간은 {time}, 활동은 "{activity}"입니다.
 
 요구 사항:
 1) 겉보기 행동(visible_action)은 관찰 가능한 묘사만 합니다. 의도는 드러내지 않습니다.
 2) 속마음(hidden_context)은 구체적인 제약/불편/의도를 포함합니다.
-3) 반드시 JSON만 출력합니다.
+3) needs_voice_command는 \"현재 상황을 고려했을 때 VA에게 명령을 내릴 필요가 있거나 내릴 수 있는지\"를 True/False로 표시합니다.
+4) 모든 묘사와 대사는 한국어로 출력합니다.
+5) 반드시 JSON만 출력합니다.
 
 출력 형식:
 {{
   "visible_action": "...",
-  "hidden_context": "..."
+  "hidden_context": "...",
+  "needs_voice_command": true
 }}
 """.strip()
 
@@ -144,14 +131,21 @@ class SimulationEngine:
         return ActionContext.parse_obj(data)
 
     def _generate_command(self, hidden_context: str, visible_action: str) -> str:
-        system_role = "당신은 한국어로 스마트홈 명령을 생성합니다. 반드시 JSON만 출력하세요."
+        system_role = (
+            "당신은 한국어로 스마트홈 명령을 생성합니다. "
+            "모든 묘사와 대사는 한국어로 출력하세요. 반드시 JSON만 출력하세요."
+        )
         prompt = f"""
 [상황]
 - 속마음: {hidden_context}
 - 겉보기 행동: {visible_action}
 
-위 상황을 해결하거나 돕기 위해 스마트홈 VA에게 할 자연스러운 한국어 명령을 만들어 주세요.
-반드시 JSON만 출력하세요.
+위 상황을 해결하거나 돕기 위해 스마트홈 VA에게 할 명령을 만들어 주세요.
+요구 사항:
+1) 목적 지향적(Goal-oriented) 명령을 우선합니다. (예: 조명/TV/에어컨 등 IoT 제어, 날씨/시간 등의 정보 확인)
+2) 단순한 잡담(Chit-chat)은 가급적 배제합니다.
+3) 모든 묘사와 대사는 한국어로 출력합니다.
+4) 반드시 JSON만 출력하세요.
 
 출력 형식:
 {{
@@ -169,7 +163,10 @@ class SimulationEngine:
         response: str,
         state_changes: List[StateChange],
     ) -> SelfEvaluation:
-        system_role = "당신은 사용자 입장에서 만족도를 평가합니다. 반드시 JSON만 출력하세요."
+        system_role = (
+            "당신은 사용자 입장에서 만족도를 평가합니다. "
+            "모든 묘사와 대사는 한국어로 출력하세요. 반드시 JSON만 출력하세요."
+        )
         change_text = _format_state_changes(state_changes)
         prompt = f"""
 [상황] 속마음: {hidden_context}
@@ -177,6 +174,7 @@ class SimulationEngine:
 [대화] 나: "{command}" / VA: "{response}"
 
 위 정보를 종합할 때, 본인의 의도가 얼마나 잘 충족되었습니까? (1-7점)
+모든 묘사와 대사는 한국어로 출력합니다.
 반드시 JSON만 출력하세요.
 
 출력 형식:

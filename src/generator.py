@@ -16,7 +16,10 @@ def generate_environment(
     output_path: Path = Path("data/generated/environment.json"),
     model: Optional[str] = None,
 ) -> Dict[str, Any]:
-    system_role = "당신은 스마트홈 연구용 데이터를 생성하는 도우미입니다. 반드시 JSON만 출력하세요."
+    system_role = (
+        "당신은 스마트홈 연구용 데이터를 생성하는 도우미입니다. "
+        "모든 묘사와 대사는 한국어로 출력하세요. 반드시 JSON만 출력하세요."
+    )
     prompt = """
 한국의 일반적인 30평대 아파트 구조와 스마트홈 IoT 기기 구성을 JSON으로 작성하세요.
 
@@ -26,6 +29,7 @@ def generate_environment(
 3) 각 기기 속성에는 state_value와 is_observable을 포함합니다.
 4) is_observable은 '제 3자가 눈으로 상태를 확인 가능한지'를 True/False로 설정합니다.
 5) 방 이름과 기기 이름은 한국어로 작성하세요.
+6) 모든 묘사와 대사는 한국어로 출력합니다.
 
 스키마:
 {
@@ -60,7 +64,10 @@ def generate_avatar(
     output_path: Path = Path("data/generated/avatar_profile.json"),
     model: Optional[str] = None,
 ) -> Dict[str, Any]:
-    system_role = "당신은 연구용 페르소나와 스케줄을 만드는 도우미입니다. 반드시 JSON만 출력하세요."
+    system_role = (
+        "당신은 연구용 페르소나와 스케줄을 만드는 도우미입니다. "
+        "모든 묘사와 대사는 한국어로 출력하세요. 반드시 JSON만 출력하세요."
+    )
     prompt = """
 한국에서 거주하는 1인 가구 페르소나를 만들고 일주일치 스케줄을 JSON으로 작성하세요.
 
@@ -69,6 +76,7 @@ def generate_avatar(
 2) 구조는 아래 스키마를 따릅니다.
 3) schedule은 7일치이며, 각 항목의 time은 "요일 HH:MM" 형식입니다.
 4) activity는 구체적 행동을 간단히 묘사합니다. (예: "퇴근 후 TV 시청")
+5) 모든 묘사와 대사는 한국어로 출력합니다.
 
 스키마:
 {

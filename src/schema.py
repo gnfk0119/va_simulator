@@ -46,6 +46,22 @@ class AvatarProfile(BaseModel):
         extra = "ignore"
 
 
+# --- Phase 2: Action & Context ---
+class ActionContext(BaseModel):
+    visible_action: str
+    hidden_context: str
+    needs_voice_command: bool = Field(
+        ...,
+        description=(
+            "현재 상황을 고려했을 때 VA에게 명령을 내릴 필요가 있거나 "
+            "내릴 수 있는 상황인지 여부"
+        ),
+    )
+
+    class Config:
+        extra = "ignore"
+
+
 # --- Phase 2: Simulation Log ---
 class StateChange(BaseModel):
     device_name: str
