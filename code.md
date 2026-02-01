@@ -248,3 +248,12 @@ def query_llm(prompt: str, system_role: str, model_schema: BaseModel = None) -> 
 이 계획서는 바로 프로젝트 폴더를 생성하고 `src/schema.py`부터 작성을 시작할 수 있도록 구조화되었습니다.
 
 ```
+
+---
+### 실행 방법:
+
+python main.py --mode generate
+
+python main.py --mode simulate
+
+python main.py --mode evaluate

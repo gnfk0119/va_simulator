@@ -94,20 +94,20 @@ def run_observer_evaluation(
 
         system_role = "당신은 관찰자 관점에서 평가합니다. 반드시 JSON만 출력하세요."
         prompt = f"""
-[관찰 데이터]
-- 행동: {log.visible_action}
-- 관측된 결과: {observable_text}
-- 대화: 사용자="{log.command}" / VA="{log.va_response}"
+            [관찰 데이터]
+            - 행동: {log.visible_action}
+            - 관측된 결과: {observable_text}
+            - 대화: 사용자="{log.command}" / VA="{log.va_response}"
 
-CCTV로 지켜보는 제 3자 입장에서, 이 상호작용이 얼마나 자연스럽고 적절해 보입니까? (1-7점)
-반드시 JSON만 출력하세요.
+            CCTV로 지켜보는 제 3자 입장에서, 이 상호작용이 얼마나 만족스러워 보입니까? (1-7점)
+            반드시 JSON만 출력하세요.
 
-출력 형식:
-{{
-  "observer_rating": 1,
-  "observer_reason": "이유"
-}}
-""".strip()
+            출력 형식:
+            {{
+            "observer_rating": 1,
+            "observer_reason": "이유"
+            }}
+            """.strip()
 
         data = query_llm(prompt, system_role, model_schema=ObserverEvaluation, model=model)
         evaluation = ObserverEvaluation.parse_obj(data)

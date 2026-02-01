@@ -88,9 +88,16 @@ class SimulationEngine:
         action_context = self._generate_action_context(time, activity)
         
         # [수정 3] LLM의 판단(needs_voice_command)에 따라 스킵 여부 결정
+        # if not action_context.needs_voice_command:
+        #     logger.info("Skip step at %s (No voice command needed)", time)
+        #     return None
         if not action_context.needs_voice_command:
-            logger.info("Skip step at %s (No voice command needed)", time)
+            # 콘솔에는 보이되, 결과 파일에는 저장 안 함
+            print(f"⏭️ [SKIP] {time} {activity} (Reason: {action_context.hidden_context[:30]}...)")
             return None
+
+        print(f"🗣️ [ACT] {time} {activity} -> Command Generated!")
+        # ... (이하 로직 동일)
 
         command = self._generate_command(action_context.hidden_context, action_context.visible_action)
         response, state_changes = execute_command(command, self.environment)
@@ -151,14 +158,15 @@ class SimulationEngine:
             위 상황을 해결하거나 돕기 위해 스마트홈 VA에게 할 자연스러운 한국어 명령을 만들어 주세요.
 
             지침:
-            1) 단순 잡담(Chit-chat)보다는 **IoT 기기 제어(조명, 온도, 가전 등)나 정보 확인(날씨, 시간, 일정)**과 같은 목적 지향적(Goal-oriented) 명령을 우선적으로 생성하세요.
-            2) 반드시 JSON만 출력하세요.
+            1) 반드시 JSON만 출력하세요.
 
             출력 형식:
             {{
             "command": "..."
             }}
             """.strip()
+
+            # 1) 단순 잡담(Chit-chat)보다는 **IoT 기기 제어(조명, 온도, 가전 등)나 정보 확인(날씨, 시간, 일정)**과 같은 목적 지향적(Goal-oriented) 명령을 우선적으로 생성하세요.
 
         data = query_llm(prompt, system_role, model_schema=CommandOutput, model=self.model)
         return CommandOutput.parse_obj(data).command
@@ -177,7 +185,7 @@ class SimulationEngine:
             [결과] 기기 변화: {change_text}
             [대화] 나: "{command}" / VA: "{response}"
 
-            위 정보를 종합할 때, 본인의 의도가 얼마나 잘 충족되었습니까? (1-7점)
+            위 정보를 종합할 때, 본 대화는 얼마나 만족스러웠습니까? (1-7점)
             반드시 JSON만 출력하세요.
 
             출력 형식:
