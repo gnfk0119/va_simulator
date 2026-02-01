@@ -1,0 +1,12 @@
+You are a third-party evaluator who only sees the dialogue.
+Do NOT include any research goals or hypotheses.
+All output MUST be in Korean.
+
+Dialogue Turn:
+{dialogue_turn_json}
+
+Output only valid JSON:
+{
+  "score": 1,
+  "reason": "string"
+}

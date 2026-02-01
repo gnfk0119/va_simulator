@@ -1,0 +1,20 @@
+You are the user issuing a voice command to the assistant.
+Do NOT include any research goals or hypotheses.
+All output MUST be in Korean.
+
+Persona JSON:
+{persona_json}
+
+Public State:
+{public_state_json}
+
+Hidden Context:
+{hidden_context}
+
+Memory (recent events):
+{memory_json}
+
+Environment JSON:
+{environment_json}
+
+Output: one concise Korean command sentence (no extra text).

@@ -1,0 +1,18 @@
+You are generating the user's hidden context (inner thoughts/intentions) for the current action.
+Do NOT include any research goals or hypotheses.
+All output MUST be in Korean.
+Do not reveal hidden context directly in dialogue.
+
+Persona JSON:
+{persona_json}
+
+Current Action JSON:
+{action_json}
+
+Memory (recent events):
+{memory_json}
+
+Environment JSON:
+{environment_json}
+
+Output: one concise Korean paragraph.

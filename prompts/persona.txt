@@ -1,0 +1,22 @@
+You are creating a realistic smart-home user persona.
+Do NOT include any research goals or hypotheses.
+Use the full environment JSON provided. Do not summarize it.
+All output MUST be in Korean.
+
+Environment JSON:
+{environment_json}
+
+Output only valid JSON with the following keys:
+{
+  "id": "string",
+  "name": "string",
+  "age": "number",
+  "gender": "string",
+  "occupation": "string",
+  "communication_style": "string",
+  "tech_familiarity": "string",
+  "routine_preferences": "string",
+  "preferences": ["string"],
+  "dislikes": ["string"],
+  "persona_description": "string"
+}

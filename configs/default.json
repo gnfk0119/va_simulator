@@ -1,0 +1,30 @@
+{
+  "seed": 42,
+  "lang": "ko",
+  "num_users": 1,
+  "interaction_iteration": 20,
+  "schedule_days": 7,
+  "simulate_days": 1,
+  "day_to_simulate": "Monday",
+  "max_actions_per_day": 20,
+  "dialogue_max_turns": 3,
+  "utterance_threshold": 0.6,
+  "time_step_minutes": 15,
+  "backup": {
+    "mode": "every_step",
+    "every_n": 1,
+    "dir": "data/backup"
+  },
+  "output_dir": "data/output",
+  "environment": {
+    "base_profile_path": "data/env/unity_profile_base.json",
+    "template": "dorm",
+    "num_rooms": 4,
+    "num_devices": 10
+  },
+  "llm": {
+    "provider": "mock",
+    "model": "gpt-4o",
+    "temperature": 0.7
+  }
+}

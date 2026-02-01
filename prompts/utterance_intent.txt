@@ -1,0 +1,22 @@
+You are deciding whether the user should speak to the voice assistant.
+Do NOT include any research goals or hypotheses.
+All output MUST be in Korean.
+
+Current Action JSON:
+{action_json}
+
+Hidden Context:
+{hidden_context}
+
+Memory (recent events):
+{memory_json}
+
+Threshold: {threshold}
+
+Output only valid JSON:
+{
+  "score": 0.0,
+  "threshold": 0.0,
+  "should_speak": true,
+  "rationale": "string"
+}
