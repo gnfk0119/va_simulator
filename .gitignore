@@ -5,3 +5,4 @@ __pycache__/
 /data/backup/
 /data/output/
 Reference frameworks/
+.venv/
