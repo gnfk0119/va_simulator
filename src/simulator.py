@@ -4,15 +4,27 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from src.schema import ActionContext, AvatarProfile, Environment, InteractionLog, StateChange
+from src.schema import AvatarProfile, Environment, InteractionLog, StateChange
 from src.va_agent import execute_command
 from utils.llm_client import query_llm
 from utils.logger import get_logger
 
 
 logger = get_logger(__name__)
+
+
+class ActionContext(BaseModel):
+    visible_action: str
+    hidden_context: str
+    needs_voice_command: bool = Field(
+        ...,
+        description=(
+            "현재 상황에서 IoT 기기 제어나 정보 확인을 위해 음성 명령이 "
+            "필요한 상황인지 여부"
+        ),
+    )
 
 
 class CommandOutput(BaseModel):
@@ -74,8 +86,9 @@ class SimulationEngine:
 
     def run_step(self, time: str, activity: str) -> Optional[Dict[str, Any]]:
         action_context = self._generate_action_context(time, activity)
+
         if not action_context.needs_voice_command:
-            logger.info("Skip step at %s due to needs_voice_command=False", time)
+            logger.info("Skip step at %s (No voice command needed)", time)
             return None
 
         command = self._generate_command(
@@ -115,7 +128,9 @@ class SimulationEngine:
 요구 사항:
 1) 겉보기 행동(visible_action)은 관찰 가능한 묘사만 합니다. 의도는 드러내지 않습니다.
 2) 속마음(hidden_context)은 구체적인 제약/불편/의도를 포함합니다.
-3) needs_voice_command는 \"현재 상황을 고려했을 때 VA에게 명령을 내릴 필요가 있거나 내릴 수 있는지\"를 True/False로 표시합니다.
+3) needs_voice_command는 현재 상황을 고려했을 때 IoT 기기 제어나 정보 확인을 위해
+   음성 명령이 필요하거나 가능한 상황인지 True/False로 표시합니다.
+   예) 양치 중이라 발화가 불가능하면 false, 소파에 앉아 TV를 보고 싶으면 true
 4) 모든 묘사와 대사는 한국어로 출력합니다.
 5) 반드시 JSON만 출력합니다.
 
@@ -141,11 +156,9 @@ class SimulationEngine:
 - 겉보기 행동: {visible_action}
 
 위 상황을 해결하거나 돕기 위해 스마트홈 VA에게 할 명령을 만들어 주세요.
-요구 사항:
-1) 목적 지향적(Goal-oriented) 명령을 우선합니다. (예: 조명/TV/에어컨 등 IoT 제어, 날씨/시간 등의 정보 확인)
-2) 단순한 잡담(Chit-chat)은 가급적 배제합니다.
-3) 모든 묘사와 대사는 한국어로 출력합니다.
-4) 반드시 JSON만 출력하세요.
+단순 잡담보다는 IoT 기기 제어(조명, 온도 등)나 정보 확인(날씨, 시간)과 같은 목적 지향적(Goal-oriented) 명령을 우선적으로 생성하세요.
+모든 묘사와 대사는 한국어로 출력합니다.
+반드시 JSON만 출력하세요.
 
 출력 형식:
 {{
