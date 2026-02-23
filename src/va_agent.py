@@ -14,12 +14,13 @@ logger = get_logger(__name__)
 class VAResponse(BaseModel):
     response_text: str = Field(..., description="사용자에게 할 자연스러운 한국어 응답")
     changes: List[StateChange] = Field(default_factory=list, description="기기 상태 변경 내역 리스트")
+    state_change_description: str = Field(..., description="기기들이 어떻게 조작되었는지 하나의 자연스러운 한국어 문장으로 요약 (예: 거실 에어컨이 켜지고 온도가 18도로 설정되었습니다.) 상태 변경이 없으면 빈 문자열.")
 
 def execute_command(
     command: str, 
     environment: Environment, 
     model: str = "gpt-4o"
-) -> Tuple[str, List[StateChange]]:
+) -> Tuple[str, List[StateChange], str]:
     """
     LLM을 사용하여 환경(Environment)을 이해하고 명령을 수행합니다.
     """
@@ -60,10 +61,11 @@ def execute_command(
           "before": "off",
           "after": "on"
         }}
-      ]
+      ],
+      "state_change_description": "거실 조명이 켜졌습니다."
     }}
 
-    만약 상태 변경이 없다면 "changes": [] 로 비워두세요.
+    만약 상태 변경이 없다면 "changes": [] 로 비워두고, "state_change_description": "관측 가능한 기기 상태 변화 없음" 으로 작성하세요.
     """
 
     # 2. LLM 호출
@@ -74,7 +76,7 @@ def execute_command(
     except Exception as e:
         logger.error(f"VA Agent LLM Error: {e}")
         # 에러 발생 시 프로그램이 멈추지 않고, 사용자에게 사과 후 넘어가도록 처리
-        return "죄송합니다. 잠시 시스템 오류가 있어 요청을 처리하지 못했어요.", []
+        return "죄송합니다. 잠시 시스템 오류가 있어 요청을 처리하지 못했어요.", [], "관측 가능한 기기 상태 변화 없음"
 
     # 3. 실제 Environment 객체 업데이트 (State Update)
     applied_changes = []
@@ -97,4 +99,4 @@ def execute_command(
         else:
             logger.warning(f"Failed to apply change: {change.device_name}.{change.property_name} not found.")
 
-    return parsed_result.response_text, applied_changes
+    return parsed_result.response_text, applied_changes, parsed_result.state_change_description

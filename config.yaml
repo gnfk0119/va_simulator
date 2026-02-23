@@ -1,9 +1,7 @@
-# config.yaml
-simulation:
-  num_profiles: 3              # 생성 및 시뮬레이션할 아바타(사용자) 수
-  model_name: "gpt-4o"         # 사용할 LLM 모델 (예: gpt-4-turbo, gpt-3.5-turbo)
-
 paths:
-  environment: "data/generated/environment.json"
-  avatar_dir: "data/generated/profiles"  # 프로필들이 저장될 폴더
-  log_dir: "data/logs"
+  avatar_dir: data/generated/profiles
+  environment: data/generated/environment.json
+  log_dir: data/logs
+simulation:
+  model_name: gpt-4o
+  num_profiles: 1
