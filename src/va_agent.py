@@ -32,11 +32,24 @@ def execute_command(
     except AttributeError:
         env_state = environment.json(ensure_ascii=False)
 
-    system_role = "당신은 스마트홈 AI 비서입니다. 현재 집안의 기기 상태를 보고 사용자의 명령을 수행하세요."
+    # 1. Provide a parsed, strict allow-list of devices and their properties.
+    device_allowlist_lines = []
+    for room_name, objects in environment.rooms.items():
+        device_allowlist_lines.append(f"- {room_name}")
+        for obj in objects:
+            props = list(obj.properties.keys())
+            device_allowlist_lines.append(f"  - {obj.name} {props}")
+    device_allowlist_str = "\n".join(device_allowlist_lines)
+
+    system_role = "당신은 스마트홈 AI 비서입니다. 현재 집안의 가용 기기 상태를 보고 사용자의 명령을 수행하세요."
     
-    # [핵심 수정] JSON 출력 예시를 프롬프트에 명시적으로 추가
     prompt = f"""
-    [현재 집안 환경 및 기기 상태]
+    [현재 집안 환경 및 허용된 기기 상태 목록]
+    (반드시 아래 목록에 있는 '기기 이름'과 괄호 안의 '허용된 속성(property)'만 조작할 수 있습니다)
+    
+    {device_allowlist_str}
+
+    [현재 집안 전체 상세 상태 원본]
     {env_state}
 
     [사용자 명령]
@@ -44,9 +57,9 @@ def execute_command(
 
     [지시사항]
     1. 사용자의 명령을 해석하여 적절한 기기를 찾고 상태를 변경하세요.
-    2. 명령이 모호하면 되묻거나, 가장 적절한 기기를 추론하여 실행하세요.
-    3. 실행할 수 없는 명령이면 정중히 거절하세요.
-    4. **중요:** 상태 변경 시 `device_name`과 `property_name`은 위 [현재 집안 환경]에 있는 정확한 값을 써야 합니다.
+    2. 명령이 모호하면 가장 적절한 기기를 추론하되, 반드시 [현재 집안 환경 및 허용된 기기 상태 목록]에 명시된 기기 이름과 속성만 사용하세요.
+    3. 없는 기기나 없는 속성(예: 무드등에 brightness가 없는데 밝기를 조절하라는 등)을 조작하려 하면 안 됩니다. 지원하지 않는다고 응답하세요.
+    4. **중요:** 상태 변경 시 `device_name`과 `property_name`은 정확히 일치해야 합니다.
     5. 응답(response_text)은 한국어로 친절하고 자연스럽게 작성하세요.
 
     [출력 포맷 예시]
@@ -56,16 +69,17 @@ def execute_command(
       "response_text": "네, 거실 조명을 켰습니다.",
       "changes": [
         {{
-          "device_name": "거실 조명",
+          "device_name": "거실 메인 조명",
           "property_name": "power",
           "before": "off",
           "after": "on"
         }}
       ],
-      "state_change_description": "거실 조명이 켜졌습니다."
+      "state_change_description": "거실 메인 조명.power: off -> on"
     }}
 
     만약 상태 변경이 없다면 "changes": [] 로 비워두고, "state_change_description": "관측 가능한 기기 상태 변화 없음" 으로 작성하세요.
+    주의: "state_change_description"에는 절대로 자연어 설명을 적지 마세요. 오직 "기기명.속성명: 이전값 -> 변경값" 형식으로만 여러 개일 경우 세미콜론(;)으로 연결하여 적으세요.
     """
 
     # 2. LLM 호출
@@ -83,7 +97,7 @@ def execute_command(
     
     for change in parsed_result.changes:
         target_device = None
-        # 해당 기기 찾기
+        # 1차 시도: 해당 기기 정확히 찾기
         for room_name, objects in environment.rooms.items():
             for obj in objects:
                 if obj.name == change.device_name:
@@ -92,11 +106,39 @@ def execute_command(
             if target_device:
                 break
         
-        if target_device and change.property_name in target_device.properties:
+        # 2차 시도: LLM이 '침실1(안방) 메인 조명' 같이 방 이름과 섞어서 생성한 경우를 위한 휴리스틱(부분 일치)
+        if target_device is None:
+            for room_name, objects in environment.rooms.items():
+                for obj in objects:
+                    if obj.name in change.device_name or change.device_name in obj.name:
+                        target_device = obj
+                        change.device_name = obj.name
+                        logger.info(f"Fallback matched device '{change.device_name}' via substring matching.")
+                        break
+                if target_device:
+                    break
+
+        if target_device is None:
+            logger.warning(f"Failed to apply change: Device '{change.device_name}' not found in environment.")
+            continue
+
+        prop_name = change.property_name
+        
+        # Fallback 1: if LLM hallucinates 'brightness' but target only has 'power', map to 'power' heuristically
+        if prop_name not in target_device.properties:
+            if prop_name == "brightness" and "power" in target_device.properties:
+                prop_name = "power"
+                change.after = "on" if str(change.after).strip() != "0" else "off"
+                logger.info(f"Fallback matched '{change.device_name}': mapped 'brightness' to 'power' ({change.after})")
+
+        if prop_name in target_device.properties:
             # 상태 업데이트 적용
-            target_device.properties[change.property_name].state_value = change.after
+            target_device.properties[prop_name].state_value = change.after
+            
+            # 레코드를 위해 프로퍼티 이름도 변경된 값으로 동기화
+            change.property_name = prop_name
             applied_changes.append(change)
         else:
-            logger.warning(f"Failed to apply change: {change.device_name}.{change.property_name} not found.")
+            logger.warning(f"Failed to apply change: {change.device_name}.{prop_name} not found.")
 
     return parsed_result.response_text, applied_changes, parsed_result.state_change_description

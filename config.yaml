@@ -3,5 +3,22 @@ paths:
   environment: data/generated/environment.json
   log_dir: data/logs
 simulation:
-  model_name: gpt-4o
+  period: "평일만" # "일주일 전체" | "평일만" | "일요일" | "금토일"
   num_profiles: 1
+
+  models:
+    environment: "gpt-4o"
+    schedule_and_eval: "gpt-4o-mini"
+    va: "gpt-4o-mini"
+
+  family_generation:
+    mode: "prompt"  # "random" | "prompt" | "template"
+    
+    random_constraints:
+      size_min: 2
+      size_max: 4
+      location: "수도권 및 시 지역"
+      min_monthly_income_krw: 4000000
+    
+    prompt_instruction: "2인 30대 부부 + 고등학생 여학생 자녀"
+    template_name: "default_couple" 

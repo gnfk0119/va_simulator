@@ -44,7 +44,7 @@ class MemberProfile(BaseModel):
     age: int
     economic_status: str
     monthly_income: str
-    traits: str
+    bio: str
     schedule: List[ScheduleEvent]
 
     class Config:
@@ -54,6 +54,28 @@ class MemberProfile(BaseModel):
 class FamilyProfile(BaseModel):
     family_id: str
     members: List[MemberProfile]
+
+    class Config:
+        extra = "ignore"
+
+
+# --- Phase 1: Generated Demographics ---
+class GeneratedMember(BaseModel):
+    name: str = Field(..., description="구성원 이름 (예: 김철수)")
+    role: str = Field(..., description="가계에서의 역할 (예: 아빠(가구주), 엄마(배우자), 아들(자녀))")
+    age: int = Field(..., description="나이 (0 ~ 100)")
+    gender: str = Field(..., description="'남성' 또는 '여성'")
+    economic_status: str = Field(..., description="경제활동 상태 (예: 재직중, 학생, 주부 등)")
+    monthly_income: str = Field(..., description="가구 소득 수준 문자열 (예: 500만원 이상)")
+    bio: str = Field(..., description="해당 구성원의 성격과 전자기기 활용 습관 등 3문장 이상의 구체적인 인물 소개")
+    is_working: bool = Field(..., description="현재 직장/경제활동을 하는지 여부")
+
+    class Config:
+        extra = "ignore"
+
+class GeneratedFamily(BaseModel):
+    location: str = Field(..., description="거주지 (예: 수도권 및 시 지역)")
+    members: List[GeneratedMember]
 
     class Config:
         extra = "ignore"
@@ -73,7 +95,8 @@ class MemoryItem(BaseModel):
 
 # --- Phase 2: Action & Context ---
 class ActionContext(BaseModel):
-    concrete_action: str = Field(..., description="구체화된 행동 (예: 거실 소파에 앉아 조용히 낮잠을 잠)")
+    quarterly_activity: str = Field(..., description="15분 단위의 구체적인 활동 요약")
+    concrete_action: str = Field(..., description="구체화된 3문장 이상의 순차적인 행동 묘사")
     latent_command: str = Field(..., description="잠재 명령 - 현재 상황에서 VA에게 할 실제 명령어 (예: 조용히 안방 에어컨 틀어줘)")
     needs_voice_command: bool = Field(
         ...,
@@ -124,6 +147,8 @@ class InteractionLog(BaseModel):
 
     # Inputs for 1st Person
     location: str
+    hourly_activity: str
+    quarterly_activity: str
     concrete_action: str
     latent_command: str
     shared_memory_refs: List[str] = Field(default_factory=list)
@@ -134,4 +159,3 @@ class InteractionLog(BaseModel):
 
     class Config:
         extra = "ignore"
-

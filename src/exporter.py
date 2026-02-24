@@ -37,7 +37,7 @@ def export_to_excel(
                 "Age": m.get("age"),
                 "Economic Status": m.get("economic_status"),
                 "Monthly Income": m.get("monthly_income"),
-                "Traits": m.get("traits")
+                "Bio": m.get("bio")
             })
         df_family = pd.DataFrame(members_list)
         out_family = output_dir / "1_family_info.xlsx"
@@ -80,6 +80,8 @@ def export_to_excel(
                 "Member Role": log.get("member_role"),
                 "Age": log.get("member_age"),
                 "Location": log.get("location"),
+                "Hourly Activity": log.get("hourly_activity"),
+                "Quarterly Activity": log.get("quarterly_activity"),
                 "Concrete Action": log.get("concrete_action"),
                 "Latent Command": log.get("latent_command"),
                 "Used Memories": " | ".join(log.get("shared_memory_refs", []))

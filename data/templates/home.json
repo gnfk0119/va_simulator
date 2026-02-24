@@ -1,0 +1,534 @@
+{
+    "unit_types": [
+        {
+            "type": "A",
+            "layout_summary": "복도 접근. 전면에 거실+침실1이 놓이고, 침실2/3은 복도측에 배치. 주방/식당은 붙어 있으며 욕실은 1개. 작은 다용도(작업) 공간이 따로 있음.",
+            "features": {
+                "access_feel": "공용 복도와 생활공간의 심리적 거리가 가까움",
+                "zoning": "전면(체류) 중심 + 복도측(침실) 배치",
+                "privacy_sound": "복도측 침실의 노출/소음 영향 가능성이 상대적으로 큼",
+                "circulation": "내부 복도(일자 분배) 중심 이동",
+                "service_zone_character": "작은 다용도/작업 공간에 세탁·정리·생활 작업이 모이기 쉬움",
+                "key_parameters": [
+                    "access_type=corridor",
+                    "front_bay_count=2",
+                    "bath_count_common=1"
+                ]
+            },
+            "simulation_notes": [
+                "외부(복도) 기척/소음 이벤트가 실내 경험에 영향을 주는 설정을 넣기 쉬움",
+                "체류는 거실/안방에 집중되고, 작업은 주방/다용도에서 발생하는 패턴이 자연스러움"
+            ],
+            "rooms": [
+                {
+                    "id": "entry",
+                    "name": "현관",
+                    "role": "출입/완충",
+                    "adjacent_to": [
+                        "hall_or_corridor"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "hall_or_corridor",
+                    "name": "내부 복도",
+                    "role": "공간 분기",
+                    "adjacent_to": [
+                        "living",
+                        "kitchen_dining",
+                        "bedroom1",
+                        "bedroom2",
+                        "bedroom3",
+                        "bath_common",
+                        "utility"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "living",
+                    "name": "거실",
+                    "role": "가족 공용 체류",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall_or_corridor"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "kitchen_dining",
+                    "name": "주방/식당",
+                    "role": "조리/식사",
+                    "zone": "middle_or_rear",
+                    "adjacent_to": [
+                        "hall_or_corridor",
+                        "utility"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom1",
+                    "name": "침실1(안방)",
+                    "role": "주요 침실",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall_or_corridor"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom2",
+                    "name": "침실2",
+                    "role": "보조 침실",
+                    "zone": "corridor_side",
+                    "adjacent_to": [
+                        "hall_or_corridor"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom3",
+                    "name": "침실3",
+                    "role": "보조 침실",
+                    "zone": "corridor_side",
+                    "adjacent_to": [
+                        "hall_or_corridor"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bath_common",
+                    "name": "욕실(공용)",
+                    "role": "위생",
+                    "adjacent_to": [
+                        "hall_or_corridor"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "utility",
+                    "name": "다용도/작업 공간",
+                    "role": "세탁/정리/작업",
+                    "adjacent_to": [
+                        "kitchen_dining",
+                        "hall_or_corridor"
+                    ],
+                    "appliances": []
+                }
+            ]
+        },
+        {
+            "type": "B",
+            "layout_summary": "현관-홀을 거쳐 거실/방/주방으로 분기. 2Bay 기반. 공용욕실 + 안방 미니욕실이 추가될 수 있음. 다용도 기능이 후면 서비스존(발코니)로 이동하는 경향.",
+            "features": {
+                "access_feel": "현관 이후 홀에서 공간이 갈라지는 ‘중앙 분배점’이 있음",
+                "zoning": "홀(완충/분배) → 공용(거실/주방)과 사적(침실)로 분기",
+                "privacy_sound": "A보다 공용/사적 분리가 좋아지고 침실 프라이버시가 개선되기 쉬움",
+                "circulation": "홀을 경유한 왕복 동선이 기본 패턴",
+                "service_zone_character": "세탁/보조작업이 후면 서비스존에 모이기 쉬움",
+                "key_parameters": [
+                    "access_type=staircase_hall",
+                    "front_bay_count=2",
+                    "master_bath=optional"
+                ]
+            },
+            "simulation_notes": [
+                "홀을 ‘전환 지점’으로 보고 외출/귀가, 공간 전환 이벤트를 모델링하기 좋음",
+                "서비스존에서 세탁/정리 같은 작업 이벤트가 발생하도록 설계하기 쉬움"
+            ],
+            "rooms": [
+                {
+                    "id": "entry",
+                    "name": "현관",
+                    "role": "출입/완충",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "hall",
+                    "name": "홀(분배 공간)",
+                    "role": "공간 분기",
+                    "adjacent_to": [
+                        "living",
+                        "kitchen_dining",
+                        "bedroom1",
+                        "bedroom2",
+                        "bedroom3",
+                        "bath_common",
+                        "bath_master_optional",
+                        "service_balcony_rear"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "living",
+                    "name": "거실",
+                    "role": "가족 공용 체류",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "kitchen_dining",
+                    "name": "주방/식당",
+                    "role": "조리/식사",
+                    "zone": "middle_or_rear",
+                    "adjacent_to": [
+                        "hall",
+                        "service_balcony_rear"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom1",
+                    "name": "침실1(안방)",
+                    "role": "주요 침실",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall",
+                        "bath_master_optional"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom2",
+                    "name": "침실2",
+                    "role": "보조 침실",
+                    "zone": "middle",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom3",
+                    "name": "침실3",
+                    "role": "보조 침실",
+                    "zone": "middle",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bath_common",
+                    "name": "욕실(공용)",
+                    "role": "위생",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bath_master_optional",
+                    "name": "욕실(안방, 선택)",
+                    "role": "안방 전용 위생",
+                    "adjacent_to": [
+                        "bedroom1"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "service_balcony_rear",
+                    "name": "서비스존(후면 발코니)",
+                    "role": "세탁/보조작업/수납",
+                    "zone": "rear",
+                    "adjacent_to": [
+                        "kitchen_dining",
+                        "hall"
+                    ],
+                    "appliances": []
+                }
+            ]
+        },
+        {
+            "type": "C",
+            "layout_summary": "3Bay. 전면에 거실+침실2개가 배열되고, 후면에 주방/서비스 성격 공간이 자리잡기 쉬움. 서비스 공간이 확대된 구성.",
+            "features": {
+                "access_feel": "홀을 통해 공용/사적 공간으로 분기되는 구조",
+                "zoning": "전면(체류: 거실/침실) ↔ 후면(작업: 주방/서비스) 분리가 뚜렷",
+                "privacy_sound": "전면 침실 비중이 높아지고, 체류 공간이 전면에 ‘펼쳐진’ 느낌",
+                "circulation": "전면 체류 ↔ 후면 작업(조리/정리) 이동이 자연스러운 패턴",
+                "service_zone_character": "후면 서비스존이 작업 허브(세탁/정리)로 기능하기 쉬움",
+                "key_parameters": [
+                    "access_type=staircase_hall",
+                    "front_bay_count=3",
+                    "front_rear_split=strong"
+                ]
+            },
+            "simulation_notes": [
+                "전면(휴식/체류)과 후면(조리/작업)을 역할 기반으로 분리해 행동 시퀀스를 만들기 좋음",
+                "생활 리듬을 ‘체류 → 작업 → 체류’로 구성하기 쉬움"
+            ],
+            "rooms": [
+                {
+                    "id": "entry",
+                    "name": "현관",
+                    "role": "출입/완충",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "hall",
+                    "name": "홀(분배 공간)",
+                    "role": "공간 분기",
+                    "adjacent_to": [
+                        "living",
+                        "kitchen_dining",
+                        "bedroom1",
+                        "bedroom2_front",
+                        "bedroom3",
+                        "bath_common",
+                        "bath_master_optional",
+                        "service_zone_rear"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "living",
+                    "name": "거실",
+                    "role": "가족 공용 체류",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom2_front",
+                    "name": "침실2(전면)",
+                    "role": "보조 침실(전면)",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "kitchen_dining",
+                    "name": "주방/식당",
+                    "role": "조리/식사",
+                    "zone": "rear",
+                    "adjacent_to": [
+                        "hall",
+                        "service_zone_rear"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom1",
+                    "name": "침실1(안방)",
+                    "role": "주요 침실",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall",
+                        "bath_master_optional"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom3",
+                    "name": "침실3",
+                    "role": "보조 침실",
+                    "zone": "middle_or_rear",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bath_common",
+                    "name": "욕실(공용)",
+                    "role": "위생",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bath_master_optional",
+                    "name": "욕실(안방, 선택)",
+                    "role": "안방 전용 위생",
+                    "adjacent_to": [
+                        "bedroom1"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "service_zone_rear",
+                    "name": "서비스존(후면)",
+                    "role": "세탁/정리/보조작업",
+                    "zone": "rear",
+                    "adjacent_to": [
+                        "kitchen_dining",
+                        "hall"
+                    ],
+                    "appliances": []
+                }
+            ]
+        },
+        {
+            "type": "D",
+            "layout_summary": "4Bay. 전면에 거실+침실3개가 모두 배열되고, 후면에 주방/식당 등 보조공간이 모임. 서비스존(발코니/확장영역)을 실내처럼 쓰는 옵션이 구조적으로 중요.",
+            "parameters": {
+                "balcony_mode": "standard_or_expanded"
+            },
+            "features": {
+                "access_feel": "홀을 중심으로 분기되며 전면에 방들이 일렬로 배열된 인상이 강함",
+                "zoning": "전면(거실+침실3) 집약 + 후면(주방/서비스) 집약",
+                "privacy_sound": "전면 침실이 많아 각 방의 독립성은 확보되나, 공용공간(거실)과 전면 방들이 가까움",
+                "circulation": "후면(작업) 중심 동선 + 전면(체류) 분산 체류",
+                "service_zone_character": "서비스존이 ‘보조작업/수납’ 또는 ‘확장된 실내’로 해석될 수 있음",
+                "expandability": "balcony_mode에 따라 서비스존의 성격(외부/내부)이 크게 달라짐",
+                "optional_micro_spaces": [
+                    "dressroom_optional",
+                    "storage_optional"
+                ],
+                "key_parameters": [
+                    "access_type=staircase_hall",
+                    "front_bay_count=4",
+                    "balcony_mode"
+                ]
+            },
+            "simulation_notes": [
+                "balcony_mode=standard: 서비스존에서 세탁/수납/보조작업 이벤트가 발생하는 ‘작업 공간’으로 보기 좋음",
+                "balcony_mode=expanded: 서비스존이 실내 연장으로 흡수되어 체류/작업의 경계가 흐려질 수 있음"
+            ],
+            "rooms": [
+                {
+                    "id": "entry",
+                    "name": "현관",
+                    "role": "출입/완충",
+                    "adjacent_to": [
+                        "hall",
+                        "storage_optional"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "storage_optional",
+                    "name": "보조수납(선택)",
+                    "role": "수납",
+                    "adjacent_to": [
+                        "entry",
+                        "kitchen_dining"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "hall",
+                    "name": "홀(분배 공간)",
+                    "role": "공간 분기",
+                    "adjacent_to": [
+                        "living",
+                        "kitchen_dining",
+                        "bedroom1",
+                        "bedroom2",
+                        "bedroom3",
+                        "bath_common",
+                        "bath_master_optional",
+                        "service_zone"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "living",
+                    "name": "거실",
+                    "role": "가족 공용 체류",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom1",
+                    "name": "침실1(안방)",
+                    "role": "주요 침실",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall",
+                        "bath_master_optional",
+                        "dressroom_optional"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "dressroom_optional",
+                    "name": "드레스실(선택)",
+                    "role": "수납/의류",
+                    "adjacent_to": [
+                        "bedroom1"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom2",
+                    "name": "침실2",
+                    "role": "보조 침실",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bedroom3",
+                    "name": "침실3",
+                    "role": "보조 침실",
+                    "zone": "front",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "kitchen_dining",
+                    "name": "주방/식당",
+                    "role": "조리/식사(후면 중심)",
+                    "zone": "rear",
+                    "adjacent_to": [
+                        "hall",
+                        "service_zone",
+                        "storage_optional"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bath_common",
+                    "name": "욕실(공용)",
+                    "role": "위생",
+                    "adjacent_to": [
+                        "hall"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "bath_master_optional",
+                    "name": "욕실(안방, 선택)",
+                    "role": "안방 전용 위생",
+                    "adjacent_to": [
+                        "bedroom1"
+                    ],
+                    "appliances": []
+                },
+                {
+                    "id": "service_zone",
+                    "name": "서비스존(발코니/확장영역)",
+                    "role": "세탁/수납/보조작업 또는 확장 시 실내 연장",
+                    "zone": "front_or_rear",
+                    "adjacent_to": [
+                        "kitchen_dining",
+                        "hall"
+                    ],
+                    "appliances": []
+                }
+            ]
+        }
+    ]
+}

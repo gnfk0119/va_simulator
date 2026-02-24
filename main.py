@@ -29,7 +29,11 @@ def main() -> None:
     log_dir = Path("data/logs")
     export_dir = Path("data/exports")
     
-    model_name = args.model if args.model else config["simulation"]["model_name"]
+    models_conf = config["simulation"].get("models", {})
+    model_env = args.model if args.model else models_conf.get("environment", "gpt-4o")
+    model_seq = args.model if args.model else models_conf.get("schedule_and_eval", "gpt-4o")
+    model_va = args.model if args.model else models_conf.get("va", "gpt-4o")
+
     # 예시로 1개만 기본 실행하거나, config.yaml의 num_profiles 활용
     num_runs = config["simulation"].get("num_profiles", 1)
 
@@ -50,12 +54,12 @@ def main() -> None:
             # 1. Environment 생성
             vibe = random.choice(ENV_VIBES)
             print(f"  [{i}] Generating Environment (Vibe: {vibe})...")
-            generate_environment(output_path=env_path, model=model_name, theme_hint=vibe)
+            generate_environment(output_path=env_path, model=model_env, theme_hint=vibe)
 
             # 2. Family & Schedule 생성
             print(f"  [{i}] Generating Family & Schedules from time use survey...")
             # 기본적으로 src 폴더 외부에 있는 생활시간조사 엑셀 파일 참조
-            generate_family_and_schedules(output_path=family_path, survey_data_path="생활시간조사.xlsx", model=model_name)
+            generate_family_and_schedules(output_path=family_path, survey_data_path="생활시간조사.xlsx", model=model_seq)
         
         print("✅ Data Generation Complete.")
 
@@ -88,7 +92,8 @@ def main() -> None:
                 environment_path=env_path,
                 family_path=family_path,
                 log_path=log_path,
-                model=model_name,
+                model_seq=model_seq,
+                model_va=model_va,
             )
             # Memory History는 SimulationEngine 실행 시 log_dir에 memory_history.json으로 저장됨 
             # (여러 run이 있으면 덮어쓰거나 수정 필요하지만 여기서는 단순 데모로 진행)
@@ -125,7 +130,7 @@ def main() -> None:
                 log_path=log_path,
                 environment_path=env_path,
                 output_path=eval_result_path,
-                model=model_name,
+                model=model_seq,
             )
 
             # Export to Excel

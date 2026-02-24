@@ -36,6 +36,22 @@ def _save_json(path: Path, data: Any) -> None:
 # _build_observability_index removed as requested
 
 
+def _normalize_log_entry(entry: Any) -> Optional[Dict[str, Any]]:
+    if not isinstance(entry, dict):
+        return None
+
+    # Backward compatibility for old field names.
+    if "concrete_action" not in entry and "visible_action" in entry:
+        entry["concrete_action"] = entry.get("visible_action", "")
+    if "latent_command" not in entry and "hidden_context" in entry:
+        entry["latent_command"] = entry.get("hidden_context", "")
+
+    try:
+        return InteractionLog.parse_obj(entry).dict()
+    except Exception:
+        return None
+
+
 
 
 
@@ -49,11 +65,18 @@ def run_observer_evaluation(
         raise FileNotFoundError(f"Log file not found: {log_path}")
 
     logs = _load_json(log_path)
+    if not isinstance(logs, list):
+        raise ValueError(f"Invalid log format (expected list): {log_path}")
     # observability_index 제거
     updated_logs: List[Dict[str, Any]] = []
+    skipped = 0
 
     for entry in logs:
-        log = InteractionLog.parse_obj(entry)
+        normalized = _normalize_log_entry(entry)
+        if normalized is None:
+            skipped += 1
+            continue
+        log = InteractionLog.parse_obj(normalized)
 
         # 1. With Context 평가
         if log.interaction_with_context:
@@ -78,6 +101,8 @@ def run_observer_evaluation(
         updated_logs.append(log.dict())
 
     _save_json(output_path, updated_logs)
+    if skipped:
+        logger.warning("Skipped %d incompatible log entries from %s", skipped, log_path)
     logger.info("Observer evaluation saved to %s", output_path)
     return updated_logs
 
@@ -94,11 +119,10 @@ def _evaluate_single_interaction(observable_text: str, command: str, response: s
 
         출력 형식:
         {{
-        "observer_rating": 7,
+        "observer_rating": 4,
         "observer_reason": "이유"
         }}
         """.strip()
 
     data = query_llm(prompt, system_role, model_schema=ObserverEvaluation, model=model)
     return ObserverEvaluation.parse_obj(data)
-

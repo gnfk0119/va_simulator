@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import os
+import re
+import time
 from typing import Any, Dict, Optional, Type
 
 from dotenv import load_dotenv
@@ -43,13 +45,33 @@ def _validate_schema(schema: Type[Any], data: Dict[str, Any]) -> Dict[str, Any]:
     return obj.dict()
 
 
+def _is_rate_limit_error(exc: Exception) -> bool:
+    text = str(exc).lower()
+    return "rate limit" in text or "429" in text or "rate_limit_exceeded" in text
+
+
+def _parse_retry_after_seconds(exc: Exception) -> float:
+    text = str(exc).lower()
+    # Example: "Please try again in 330ms."
+    ms_match = re.search(r"try again in\\s+([0-9]+(?:\\.[0-9]+)?)ms", text)
+    if ms_match:
+        return max(0.2, float(ms_match.group(1)) / 1000.0)
+
+    sec_match = re.search(r"try again in\\s+([0-9]+(?:\\.[0-9]+)?)s", text)
+    if sec_match:
+        return max(0.2, float(sec_match.group(1)))
+
+    return 1.0
+
+
 def query_llm(
     prompt: str,
     system_role: str,
     model_schema: Optional[Type[Any]] = None,
     model: Optional[str] = None,
     temperature: float = 0.3,
-    max_retries: int = 2,
+    max_retries: int = 6,
+    request_timeout: float = 45.0,
 ) -> Dict[str, Any]:
     """Query OpenAI and return a JSON dict.
 
@@ -67,13 +89,14 @@ def query_llm(
     ]
 
     last_error: Optional[Exception] = None
-    for _ in range(max_retries):
+    for attempt in range(max_retries):
         try:
             response = client.chat.completions.create(
                 model=model_name,
                 messages=messages,
                 temperature=temperature,
                 response_format={"type": "json_object"},
+                timeout=request_timeout,
             )
             content = response.choices[0].message.content or "{}"
             data = _extract_json(content)
@@ -82,5 +105,13 @@ def query_llm(
             return data
         except Exception as exc:  # noqa: BLE001 - surface error on final retry
             last_error = exc
+            if attempt >= max_retries - 1:
+                break
+
+            if _is_rate_limit_error(exc):
+                sleep_for = _parse_retry_after_seconds(exc) + min(2.0, attempt * 0.3)
+            else:
+                sleep_for = min(2.0, 0.5 + attempt * 0.2)
+            time.sleep(sleep_for)
 
     raise LLMError(f"LLM request failed: {last_error}")
