@@ -23,11 +23,13 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
 
+    run_name = config.get("run", {}).get("name", "default_run")
+    
     # Paths
-    env_dir = Path("data/generated/environments")
-    family_dir = Path("data/generated/families")
-    log_dir = Path("data/logs")
-    export_dir = Path("data/exports")
+    env_dir = Path(f"data/{run_name}/generated/environments")
+    family_dir = Path(f"data/{run_name}/generated/families")
+    log_dir = Path(f"data/{run_name}/logs")
+    export_dir = Path(f"data/{run_name}/exports")
     
     models_conf = config["simulation"].get("models", {})
     model_env = args.model if args.model else models_conf.get("environment", "gpt-4o")
@@ -40,6 +42,7 @@ def main() -> None:
     env_dir.mkdir(parents=True, exist_ok=True)
     family_dir.mkdir(parents=True, exist_ok=True)
     log_dir.mkdir(parents=True, exist_ok=True)
+    export_dir.mkdir(parents=True, exist_ok=True)
 
     # ----------------------------------------------------------------
     # 1. GENERATE 모드

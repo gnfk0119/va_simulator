@@ -43,8 +43,8 @@ def _normalize_log_entry(entry: Any) -> Optional[Dict[str, Any]]:
     # Backward compatibility for old field names.
     if "concrete_action" not in entry and "visible_action" in entry:
         entry["concrete_action"] = entry.get("visible_action", "")
-    if "latent_command" not in entry and "hidden_context" in entry:
-        entry["latent_command"] = entry.get("hidden_context", "")
+    if "seed_command" not in entry and "hidden_context" in entry:
+        entry["seed_command"] = entry.get("hidden_context", "")
 
     try:
         return InteractionLog.parse_obj(entry).dict()
@@ -78,25 +78,18 @@ def run_observer_evaluation(
             continue
         log = InteractionLog.parse_obj(normalized)
 
-        # 1. With Context 평가
-        if log.interaction_with_context:
-            change_text_with = log.interaction_with_context.state_change_description or "상태 변화 없음"
-            eval_with = _evaluate_single_interaction(
-                change_text_with,
-                log.interaction_with_context.command, log.interaction_with_context.va_response, model
-            )
-            log.interaction_with_context.observer_rating = eval_with.observer_rating
-            log.interaction_with_context.observer_reason = eval_with.observer_reason
-
-        # 2. Without Context 평가
-        if log.interaction_without_context:
-            change_text_without = log.interaction_without_context.state_change_description or "상태 변화 없음"
-            eval_without = _evaluate_single_interaction(
-                change_text_without,
-                log.interaction_without_context.command, log.interaction_without_context.va_response, model
-            )
-            log.interaction_without_context.observer_rating = eval_without.observer_rating
-            log.interaction_without_context.observer_reason = eval_without.observer_reason
+        for attr_name in ["interaction_wc_vac", "interaction_wc_var", "interaction_woc_vac", "interaction_woc_var"]:
+            interaction = getattr(log, attr_name, None)
+            if interaction:
+                change_text = interaction.state_change_description or "상태 변화 없음"
+                eval_obj = _evaluate_single_interaction(
+                    change_text,
+                    interaction.command,
+                    interaction.va_response,
+                    model
+                )
+                interaction.observer_rating = eval_obj.observer_rating
+                interaction.observer_reason = eval_obj.observer_reason
 
         updated_logs.append(log.dict())
 
@@ -109,20 +102,11 @@ def run_observer_evaluation(
 
 def _evaluate_single_interaction(observable_text: str, command: str, response: str, model: Optional[str]) -> ObserverEvaluation:
     system_role = "당신은 관찰자 관점에서 평가합니다. 반드시 JSON만 출력하세요."
-    prompt = f"""
-        [관찰 가능한 단서]
-        - 기기 상태 변화 조작 결과: {observable_text}
-        - 주고받은 대화: 사용자="{command}" / VA="{response}"
-
-        CCTV나 음성 기록으로 지켜보는 제 3자 입장에서 볼 때, 오직 이 2가지 정보만으로 판단했을 때 스마트홈 AI와 사용자의 상호작용이 얼마나 완벽하게 사용자의 요구를 처리한 것처럼 보입니까? (1-7점)
-        반드시 JSON만 출력하세요.
-
-        출력 형식:
-        {{
-        "observer_rating": 4,
-        "observer_reason": "이유"
-        }}
-        """.strip()
+    prompt = Path("prompts/evaluator_observer.txt").read_text(encoding="utf-8").format(
+        observable_text=observable_text,
+        command=command,
+        response=response
+    )
 
     data = query_llm(prompt, system_role, model_schema=ObserverEvaluation, model=model)
     return ObserverEvaluation.parse_obj(data)

@@ -1,0 +1,33 @@
+[구성원 정보]
+ID: {member_id}
+이름: {name}
+역할: {role}
+나이: {age}
+경제상태: {economic_status}
+인물 소개(Bio): {bio}
+
+[{period} 요일 매핑]
+{week_day_mapping_json}
+
+[생활시간조사 필터링 데이터 (필터링된 관련 row 전체)]
+아래는 요약이 아니라 실제 필터된 row 전체입니다.
+{filtered_data_json}
+
+[작업 지시]
+{instructions}
+3. `is_at_home` 값은 해당 활동이 집 안에서 이루어지는지 여부(Boolean)입니다. 수입노동, 외출 등은 false 입니다.
+
+[JSON 스키마 예시]
+{{
+  "member_id": "{member_id}",
+  "name": "{name}",
+  "role": "{role}",
+  "age": {age},
+  "economic_status": "{economic_status}",
+  "monthly_income": "{monthly_income}",
+  "bio": "{bio}",
+  "schedule": [
+    {{"time": "09-01 07:00", "activity": "기상 및 아침 식사 준비", "is_at_home": true}},
+    {{"time": "09-01 08:00", "activity": "출근", "is_at_home": false}}
+  ]
+}}

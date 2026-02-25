@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import List, Tuple, Any
 
 from pydantic import BaseModel, Field
@@ -43,44 +44,12 @@ def execute_command(
 
     system_role = "당신은 스마트홈 AI 비서입니다. 현재 집안의 가용 기기 상태를 보고 사용자의 명령을 수행하세요."
     
-    prompt = f"""
-    [현재 집안 환경 및 허용된 기기 상태 목록]
-    (반드시 아래 목록에 있는 '기기 이름'과 괄호 안의 '허용된 속성(property)'만 조작할 수 있습니다)
-    
-    {device_allowlist_str}
-
-    [현재 집안 전체 상세 상태 원본]
-    {env_state}
-
-    [사용자 명령]
-    "{command}"
-
-    [지시사항]
-    1. 사용자의 명령을 해석하여 적절한 기기를 찾고 상태를 변경하세요.
-    2. 명령이 모호하면 가장 적절한 기기를 추론하되, 반드시 [현재 집안 환경 및 허용된 기기 상태 목록]에 명시된 기기 이름과 속성만 사용하세요.
-    3. 없는 기기나 없는 속성(예: 무드등에 brightness가 없는데 밝기를 조절하라는 등)을 조작하려 하면 안 됩니다. 지원하지 않는다고 응답하세요.
-    4. **중요:** 상태 변경 시 `device_name`과 `property_name`은 정확히 일치해야 합니다.
-    5. 응답(response_text)은 한국어로 친절하고 자연스럽게 작성하세요.
-
-    [출력 포맷 예시]
-    반드시 아래와 같은 JSON 구조로만 출력하세요. (Markdown 코드 블록 없이 순수 JSON만 출력)
-    
-    {{
-      "response_text": "네, 거실 조명을 켰습니다.",
-      "changes": [
-        {{
-          "device_name": "거실 메인 조명",
-          "property_name": "power",
-          "before": "off",
-          "after": "on"
-        }}
-      ],
-      "state_change_description": "거실 메인 조명.power: off -> on"
-    }}
-
-    만약 상태 변경이 없다면 "changes": [] 로 비워두고, "state_change_description": "관측 가능한 기기 상태 변화 없음" 으로 작성하세요.
-    주의: "state_change_description"에는 절대로 자연어 설명을 적지 마세요. 오직 "기기명.속성명: 이전값 -> 변경값" 형식으로만 여러 개일 경우 세미콜론(;)으로 연결하여 적으세요.
-    """
+    prompt_template = Path("prompts/va_agent.txt").read_text(encoding="utf-8")
+    prompt = prompt_template.format(
+        device_allowlist_str=device_allowlist_str,
+        env_state=env_state,
+        command=command
+    )
 
     # 2. LLM 호출
     try:
@@ -108,9 +77,11 @@ def execute_command(
         
         # 2차 시도: LLM이 '침실1(안방) 메인 조명' 같이 방 이름과 섞어서 생성한 경우를 위한 휴리스틱(부분 일치)
         if target_device is None:
+            norm_target = change.device_name.replace(" ", "").replace("/", "").replace("(", "").replace(")", "")
             for room_name, objects in environment.rooms.items():
                 for obj in objects:
-                    if obj.name in change.device_name or change.device_name in obj.name:
+                    norm_obj = obj.name.replace(" ", "").replace("/", "").replace("(", "").replace(")", "")
+                    if norm_obj in norm_target or norm_target in norm_obj:
                         target_device = obj
                         change.device_name = obj.name
                         logger.info(f"Fallback matched device '{change.device_name}' via substring matching.")

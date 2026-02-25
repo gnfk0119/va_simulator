@@ -150,52 +150,12 @@ def generate_environment(
     picked_layout = random.choice(list(layout_seed_map.keys()))
     layout_seed = layout_seed_map[picked_layout]
     
-    prompt = f"""
-    한국의 일반적인 30평대 아파트 구조와 스마트홈 IoT 기기 구성을 JSON으로 작성하세요.
-
-    [선택된 평면도 타입]
-    - 타입: {picked_layout}
-    - 테마 힌트: {theme_hint}
-
-    [A~D 타입 시드 (home.json)]
-    아래 JSON은 구조 시드입니다. room 이름/구조 맥락을 참고해 구체화하세요.
-    {json.dumps(layout_seed, ensure_ascii=False, indent=2)}
-
-    [1. 필수 인프라 (모든 방 공통)]
-    - 각 방에는 반드시 '메인 조명(Ceiling Light)'과 '스위치'가 포함되어야 합니다. (is_observable: true)
-
-    [2. 필수 가전 (반드시 포함)]
-    - 거실: 스탠드형 에어컨, 스마트 TV, 로봇청소기, 월패드(Wall-pad)
-    - 주방/식당: 냉장고, 김치냉장고, 전자레인지, 식기세척기, 주방 후드
-    - 방(침실1,2,3): 방 용도에 맞는 가전
-    - 다용도실/서비스존: 세탁기, 건조기
-
-    [3. 선택 가전 및 소품 (상황에 따라 5~10개 분배)]
-    - 공기청정기, 제습기, 에어드레서(스타일러), 선풍기, 무드등, 스마트 블라인드/커튼, 모션 센서, 스마트 플러그 등
-
-    [4. 데이터 구조 제약]
-    1. 반드시 JSON만 출력합니다.
-    2. 각 기기 속성에는 `state_value`와 `is_observable`(true/false)을 포함합니다.
-    3. JSON 루트의 `type_name`은 "{picked_layout}" 로 고정하세요.
-    4. rooms 딕셔너리의 키는 반드시 위 시드의 room name을 사용하세요. (시드에 없는 방 임의 생성 금지)
-    5. rooms 안에 방들의 기기 리스트를 작성하세요.
-
-    [JSON 스키마 예시]
-    {{
-      "type_name": "{picked_layout}",
-      "rooms": {{
-        "거실": [
-          {{
-            "name": "거실 메인 조명",
-            "properties": {{
-              "power": {{"state_value": "on", "is_observable": true}},
-              "brightness": {{"state_value": "100", "is_observable": true}}
-            }}
-          }}
-        ]
-      }}
-    }}
-    """.strip()
+    prompt_template = Path("prompts/generate_environment.txt").read_text(encoding="utf-8")
+    prompt = prompt_template.format(
+        picked_layout=picked_layout,
+        theme_hint=theme_hint,
+        layout_seed_json=json.dumps(layout_seed, ensure_ascii=False, indent=2)
+    )
 
     try:
         data = query_llm(
@@ -445,41 +405,20 @@ def _smooth_member_schedule(member_id: str, member_info: dict, survey_dataset: d
     else: # "일요일"
         instructions = "1. 위의 필터링 데이터 전체를 참조하여, 이 구성원의 **일요일(Day_7)** 스케줄을 시간순으로 자연스럽게 생성하세요.\n    2. 시간 간격은 가급적 **1시간 단위**로 하세요. 일요일 시간은 `09-07 HH:MM`으로 표기하세요. `time` 필드 예시: \"09-07 08:00\""
 
-    prompt = f"""
-    [구성원 정보]
-    ID: {member_id}
-    이름: {member_info['name']}
-    역할: {member_info['role']}
-    나이: {member_info['age']}
-    경제상태: {member_info['economic_status']}
-    인물 소개(Bio): {member_info['bio']}
-    
-    [{period} 요일 매핑]
-    {json.dumps(survey_dataset['week_day_mapping'], ensure_ascii=False, indent=2)}
-
-    [생활시간조사 필터링 데이터 (필터링된 관련 row 전체)]
-    아래는 요약이 아니라 실제 필터된 row 전체입니다.
-    {json.dumps(survey_dataset['filtered_data_by_day_type'], ensure_ascii=False, indent=2)}
-
-    [작업 지시]
-    {instructions}
-    3. `is_at_home` 값은 해당 활동이 집 안에서 이루어지는지 여부(Boolean)입니다. 수입노동, 외출 등은 false 입니다.
-
-    [JSON 스키마 예시]
-    {{
-      "member_id": "{member_id}",
-      "name": "{member_info['name']}",
-      "role": "{member_info['role']}",
-      "age": {member_info['age']},
-      "economic_status": "{member_info['economic_status']}",
-      "monthly_income": "{member_info['monthly_income']}",
-      "bio": "{member_info['bio']}",
-      "schedule": [
-        {{"time": "09-01 07:00", "activity": "기상 및 아침 식사 준비", "is_at_home": true}},
-        {{"time": "09-01 08:00", "activity": "출근", "is_at_home": false}}
-      ]
-    }}
-    """
+    prompt_template = Path("prompts/generate_schedule.txt").read_text(encoding="utf-8")
+    prompt = prompt_template.format(
+        member_id=member_id,
+        name=member_info['name'],
+        role=member_info['role'],
+        age=member_info['age'],
+        economic_status=member_info['economic_status'],
+        monthly_income=member_info['monthly_income'],
+        bio=member_info['bio'],
+        period=period,
+        week_day_mapping_json=json.dumps(survey_dataset['week_day_mapping'], ensure_ascii=False, indent=2),
+        filtered_data_json=json.dumps(survey_dataset['filtered_data_by_day_type'], ensure_ascii=False, indent=2),
+        instructions=instructions
+    )
     try:
         data = query_llm(
             prompt,
@@ -547,21 +486,13 @@ def _generate_random_family(model: Optional[str]) -> List[Dict[str, Any]]:
     income = rules.get("min_monthly_income_krw", 4000000)
     
     system_role = "당신은 가상 스마트홈 시뮬레이션의 가구(가족) 구성원을 무작위로 생성하는 AI입니다. 출력은 반드시 JSON이어야 합니다."
-    prompt = f"""
-    주어진 제약 조건에 맞는 가상 가족 구성원 데이터를 무작위로 생성하세요.
-    - 가족 수: {size_min}명 ~ {size_max}명 이내 무작위
-    - 부모와 자녀의 나이 차이는 최소 25살 ~ 최대 45살 이어야 합니다.
-    - 자녀가 있다면 나이는 최대 35살 이하입니다.
-    - 거주지: {location}
-    - 가구 합산 월소득: 최소 {income} 원 이상
-    
-    각 구성원의 성격, 직업, 기기 활용 습관이 담긴 bio를 3문장 이상 상세히 작성하세요.
-    반드시 다음 JSON 구조만을 출력해야 합니다. (주의: monthly_income 등 문자열 필드는 반드시 따옴표로 묶어주세요)
-    {{
-       "location": "{location}",
-       "members": [ {{ "name": "...", "role": "...", "age": 30, "gender": "...", "economic_status": "...", "monthly_income": "...만원", "bio": "...", "is_working": true }} ]
-    }}
-    """
+    prompt_template = Path("prompts/generate_random_family.txt").read_text(encoding="utf-8")
+    prompt = prompt_template.format(
+        size_min=size_min,
+        size_max=size_max,
+        location=location,
+        income=income
+    )
     
     result = query_llm(prompt, system_role, model_schema=GeneratedFamily, model=model)
     # LLM might occasionally wrap with {"family": [...]} or similar if strict mode fails.
@@ -574,18 +505,8 @@ def _generate_random_family(model: Optional[str]) -> List[Dict[str, Any]]:
 
 def _generate_prompt_family(model: Optional[str], instruction: str) -> List[Dict[str, Any]]:
     system_role = "당신은 가상 스마트홈 시뮬레이션의 가구(가족) 구성원을 사용자의 시드 자연어에 기반하여 생성하는 AI입니다. 출력은 반드시 JSON이어야 합니다."
-    prompt = f"""
-    다음 자연어 설명을 보고 가장 적합한 가족 구성원 데이터를 구체적으로 상상해서 생성하세요.
-    자연어 시드: "{instruction}"
-    
-    각 자연어 시드에 알맞은 성별, 나이, 직업, 월소득을 합리적으로 배정하세요.
-    각 구성원의 성격, 직업, 가사에 대한 태도, 기기 활용 습관이 담긴 bio를 3문장 이상 상세히 작성하세요.
-    반드시 다음 JSON 구조만을 최상단 객체로 출력해야 합니다: (주의: monthly_income 등 문자열 필드는 반드시 따옴표로 묶어주세요)
-    {{
-       "location": "거주지 (예: 수도권)",
-       "members": [ {{ "name": "...", "role": "...", "age": 30, "gender": "...", "economic_status": "...", "monthly_income": "...만원", "bio": "...", "is_working": true }} ]
-    }}
-    """
+    prompt_template = Path("prompts/generate_prompt_family.txt").read_text(encoding="utf-8")
+    prompt = prompt_template.format(instruction=instruction)
     
     result = query_llm(prompt, system_role, model_schema=GeneratedFamily, model=model)
     if isinstance(result, dict) and "family" in result and "members" not in result:

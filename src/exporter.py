@@ -50,18 +50,43 @@ def export_to_excel(
     memory_data = _load_json(memory_path)
     if memory_data:
         mem_list = []
-        for m in memory_data:
-            mem_list.append({
-                "Time": m.get("time"),
-                "Member ID": m.get("member_id"),
-                "Description": m.get("description"),
-                "Decay Weight": m.get("decay_weight"),
-                "Shared With": ", ".join(m.get("shared_with", []))
-            })
-        df_memory = pd.DataFrame(mem_list)
-        out_memory = output_dir / "2_memory_history.xlsx"
-        df_memory.to_excel(out_memory, index=False)
-        logger.info(f"Exported Memory History to {out_memory}")
+        if isinstance(memory_data, dict):
+            for member_id, time_dict in memory_data.items():
+                for time_key, items in time_dict.items():
+                    for idx, item in enumerate(items):
+                        mem_list.append({
+                            "Time": time_key,
+                            "Index": idx,
+                            "Member ID": member_id,
+                            "Log Type": item.get("log_type"),
+                            "Content": item.get("content"),
+                            "Weight": item.get("weight")
+                        })
+        elif isinstance(memory_data, list):
+            from collections import defaultdict
+            idx_counter = defaultdict(int)
+            for item in memory_data:
+                m_id = item.get("member_id", "unknown")
+                t = item.get("timestamp", "unknown")
+                key = (m_id, t)
+                idx = idx_counter[key]
+                idx_counter[key] += 1
+                mem_list.append({
+                    "Time": t,
+                    "Index": idx,
+                    "Member ID": m_id,
+                    "Log Type": item.get("log_type"),
+                    "Content": item.get("content"),
+                    "Weight": item.get("weight")
+                })
+        if mem_list:
+            df_mem = pd.DataFrame(mem_list)
+            df_mem.sort_values(by=["Time", "Member ID", "Index"], inplace=True)
+            out_mem = output_dir / "2_memory_history.xlsx"
+            df_mem.to_excel(out_mem, index=False)
+            logger.info(f"Exported Memory History to {out_mem}")
+        else:
+            logger.warning("Memory list is empty")
     else:
         logger.warning(f"Memory data not found at {memory_path}. Skipping.")
 
@@ -83,13 +108,23 @@ def export_to_excel(
                 "Hourly Activity": log.get("hourly_activity"),
                 "Quarterly Activity": log.get("quarterly_activity"),
                 "Concrete Action": log.get("concrete_action"),
-                "Latent Command": log.get("latent_command"),
+                "Seed Command": log.get("seed_command"),
                 "Used Memories": " | ".join(log.get("shared_memory_refs", []))
             }
 
             def _extract_interaction(prefix, interaction: dict):
                 if not interaction:
-                    return {}
+                    return {
+                        f"{prefix} Command": None,
+                        f"{prefix} VA Response": None,
+                        f"{prefix} State Changes": None,
+                        f"{prefix} Self Rating (SE)": None,
+                        f"{prefix} Self Reason": None,
+                        f"{prefix} Observer Rating (TE)": None,
+                        f"{prefix} Observer Reason": None,
+                        f"{prefix} Gap (SE-TE)": None,
+                        f"{prefix} Classification": None
+                    }
                 
                 # Format state changes
                 changes_str = interaction.get("state_change_description", "")
@@ -100,19 +135,34 @@ def export_to_excel(
                     else:
                         changes_str = "상태 변화 없음"
 
+                se = interaction.get("self_rating")
+                te = interaction.get("observer_rating")
+                gap = None
+                cls = ""
+                if se is not None and te is not None:
+                    try:
+                        gap = int(se) - int(te)
+                        cls = "BG" if gap >= 2 else "SG"
+                    except:
+                        pass
+                
                 return {
                     f"{prefix} Command": interaction.get("command"),
                     f"{prefix} VA Response": interaction.get("va_response"),
                     f"{prefix} State Changes": changes_str,
-                    f"{prefix} Self Rating": interaction.get("self_rating"),
+                    f"{prefix} Self Rating (SE)": se,
                     f"{prefix} Self Reason": interaction.get("self_reason"),
-                    f"{prefix} Observer Rating": interaction.get("observer_rating"),
-                    f"{prefix} Observer Reason": interaction.get("observer_reason")
+                    f"{prefix} Observer Rating (TE)": te,
+                    f"{prefix} Observer Reason": interaction.get("observer_reason"),
+                    f"{prefix} Gap (SE-TE)": gap,
+                    f"{prefix} Classification": cls
                 }
 
             row = dict(base_info)
-            row.update(_extract_interaction("With-Context", log.get("interaction_with_context")))
-            row.update(_extract_interaction("Without-Context", log.get("interaction_without_context")))
+            row.update(_extract_interaction("[WC/VAC]", log.get("interaction_wc_vac")))
+            row.update(_extract_interaction("[WC/VAR]", log.get("interaction_wc_var")))
+            row.update(_extract_interaction("[WOC/VAC]", log.get("interaction_woc_vac")))
+            row.update(_extract_interaction("[WOC/VAR]", log.get("interaction_woc_var")))
             rows.append(row)
 
         df_logs = pd.DataFrame(rows)

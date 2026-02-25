@@ -1,24 +1,36 @@
-paths:
-  avatar_dir: data/generated/profiles
-  environment: data/generated/environment.json
-  log_dir: data/logs
+run:
+  name: "pilot_3.2"
+
 simulation:
   period: "평일만" # "일주일 전체" | "평일만" | "일요일" | "금토일"
-  num_profiles: 1
+  num_profiles: 3
+  step_minutes: 15
+  start_hour: 0
+  end_hour: 24
 
-  models:
-    environment: "gpt-4o"
-    schedule_and_eval: "gpt-4o-mini"
-    va: "gpt-4o-mini"
+evaluation:
+  gap_threshold: 2
 
-  family_generation:
-    mode: "prompt"  # "random" | "prompt" | "template"
-    
-    random_constraints:
-      size_min: 2
-      size_max: 4
-      location: "수도권 및 시 지역"
-      min_monthly_income_krw: 4000000
-    
-    prompt_instruction: "2인 30대 부부 + 고등학생 여학생 자녀"
-    template_name: "default_couple" 
+memory:
+  decay_per_hour: 0.05
+  floor: 0.2
+
+models:
+  generator_env: { provider: "openai", model: "gpt-5" }
+  generator_family: { provider: "openai", model: "gpt-5" }
+  schedule: { provider: "openai", model: "gpt-5" }
+  action: { provider: "openai", model: "gpt-4o-mini" }
+  request: { provider: "openai", model: "gpt-4o-mini" }
+  va_c: { provider: "openai", model: "gpt-5" }
+  va_r_classifier: { provider: "openai", model: "gpt-4o-mini" }
+  va_r_response: { provider: "openai", model: "gpt-5" }
+  self_eval: { provider: "openai", model: "gpt-5" }
+  third_eval: { provider: "openai", model: "gpt-5" }
+
+family_generation:
+  mode: "random"  # "random" | "prompt" | "template"
+  random_constraints:
+    size_min: 2
+    size_max: 4
+    location: "수도권 및 시 지역"
+    min_monthly_income_krw: 4000000

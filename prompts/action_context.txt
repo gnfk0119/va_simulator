@@ -1,0 +1,31 @@
+[가구원 정보 (주의: 이 구성원 외의 인물은 임의로 상상하지 마세요!)]
+우리 가족 구성원: {family_members_str}
+
+[상황 정보]
+- 시간: {time} (이 시간의 15분 단위 행동을 묘사합니다)
+- 1시간 대분류 활동: "{hourly_activity}"
+- 현재 행동하는 사람: {name} ({role}, {age}세)
+- 인물 소개(Bio): {bio}
+
+[현재 집 안의 관찰 가능한 다른 가족들의 상태 (Shared Memory)]
+{mem_context}
+[가능한 집 안 위치]
+{available_rooms}
+
+요구 사항:
+1) 'quarterly_activity': 1시간 대분류 활동 안에서, 이 특정 15분 동안 수행하는 구체적인 활동 요약입니다.
+2) 'location': 현재 인물이 위치한 구체적인 장소 (집 안이라면 위 [가능한 집 안 위치] 중 하나 선택, 집 밖이라면 "집 밖" 또는 "회사" 등).
+3) 'is_at_home' (True/False): 인물이 현재 집 안에 있는지 여부.
+4) 'concrete_action': 'quarterly_activity'에서 수행하는 행동을 사용자 입장에서 **시퀀스가 있는 구체적인 행동으로 최소 3문장 이상** 작성하세요.
+5) 'wc_command': 이 행동을 진행하면서 스마트홈 환경(VA)에 실제로 요청하고 싶은 **명확한 상황/맥락(Context)이 포함된 명령어**를 구체적으로 작성하세요. (예: "아침이라 쌀쌀한데 거실 난방 좀 켜줄래?", "이제 어두우니까 책 읽기 좋게 스탠드 불 좀 밝게 켜줘"). 속마음이 아닌 직접적인 음성 발화 형태여야 합니다.
+6) 'needs_voice_command' (True/False): 이 상황에서 스마트홈 VA에게 명령을 내릴 확률이 있는지 여부. (is_at_home이 False면 무조건 False)
+
+출력 형식:
+{{
+  "quarterly_activity": "간단히 요약된 15분 단위 활동명",
+  "location": "거실",
+  "is_at_home": true,
+  "concrete_action": "첫 번째 행동 문장입니다. 두 번째 이어지는 행동 묘사입니다. 세 번째 구체적인 도구 활용이나 상황 설명 문장입니다.",
+  "wc_command": "필요한 맥락 포함 기기 제어 명령어 (With Context)",
+  "needs_voice_command": true
+}}

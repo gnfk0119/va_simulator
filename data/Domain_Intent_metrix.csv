@@ -1,0 +1,66 @@
+Domain,Intent
+계산,Calculate
+계산,can you
+기기,can you
+기기,Control
+기기,how to
+기기,Inquiry
+기기,Monitor
+기기,Solve
+기기,Turn Off
+기기,Turn On
+날씨,Compare
+날씨,Explain
+날씨,Inquiry
+날씨,Prepare
+날씨,Solve
+뉴스,Control
+뉴스,Inquiry
+뉴스,Seek
+라디오,can you
+라디오,Turn Off
+라디오,Turn On
+번역,can you
+번역,Translate
+시간,Inquiry
+알람,Adjust
+알람,can you
+알람,Check
+알람,Inquiry
+알람,Remove
+알람,Set
+알람,Solve
+알람,Turn Off
+음악,can you
+음악,Connect
+음악,Control
+음악,Play
+음악,Recommend
+음악,Search
+음악,Solve
+음악,Turn Off
+장소,Inquiry
+장소,Locate
+장소,Recommend
+캘린더,Adjust
+캘린더,Check
+캘린더,Inquiry
+캘린더,Remove
+캘린더,Set
+XQO,can you
+XQO,Connect
+XQO,Control
+XQO,how to
+XQO,Inquiry
+XQO,Monitor
+XQO,Solve
+MISC,Play
+MISC,Chit-Chat
+MISC,Inquiry
+MISC,Recommend
+MISC,Search
+택시,Call
+택시,Check
+택시,Inquiry
+HD,Inquiry
+HD,Recommend

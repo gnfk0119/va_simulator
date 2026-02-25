@@ -11,7 +11,8 @@ from src.schema import (
     ActionContext, InteractionResult, MemoryItem
 )
 from src.config import config
-from src.va_agent import execute_command
+from src.va_baseline import execute_command as va_c_execute
+from src.va_r import execute_command as va_r_execute
 from utils.llm_client import LLMError, query_llm
 from utils.logger import get_logger
 
@@ -161,8 +162,11 @@ def _normalize_member_payload(member: Dict[str, Any]) -> Dict[str, Any]:
     else: # "일요일"
         day_range = range(7, 8)
 
+    start_h = config["simulation"].get("start_hour", 0)
+    end_h = config["simulation"].get("end_hour", 24)
+
     for day in day_range:
-        for hour in range(24):
+        for hour in range(start_h, end_h):
             slot = slot_map.get((day, hour))
             if slot:
                 last_activity = slot["activity"]
@@ -191,7 +195,7 @@ def _normalize_family_payload(raw_family: Dict[str, Any]) -> Dict[str, Any]:
     return family
 
 
-def _fallback_latent_command(activity: str) -> str:
+def _fallback_seed_command(activity: str) -> str:
     text = (activity or "").strip()
     if not text:
         return ""
@@ -210,15 +214,14 @@ def _fallback_latent_command(activity: str) -> str:
     return "거실 메인 조명 켜줘"
 
 
-def _build_fallback_action_context(activity: str) -> ActionContext:
-    latent = _fallback_latent_command(activity)
-    quarterly = f"{activity} 활동의 일부 진행" if activity else "기본 생활 일부 진행"
-    concrete = f"{activity} 활동을 집 안에서 진행 중입니다. 현재 주변을 둘러보며 상태를 살핍니다. 필요한 물건을 찾아 사용하려고 합니다." if activity else "집 안에서 기본 생활을 진행 중입니다. 휴식을 취하거나 주변을 정리합니다. 특별한 행동 변화 없이 시간을 보냅니다."
+def _build_fallback_action_context(hourly_activity: str) -> ActionContext:
     return ActionContext(
-        quarterly_activity=quarterly,
-        concrete_action=concrete,
-        latent_command=latent,
-        needs_voice_command=bool(latent),
+        quarterly_activity=f"{hourly_activity} 중단",
+        location="거실",
+        is_at_home=True,
+        concrete_action="알 수 없는 행동",
+        wc_command="아이가 자니까 TV 볼륨 줄여줘",
+        needs_voice_command=False
     )
 
 
@@ -229,8 +232,8 @@ def _normalize_existing_log_entry(entry: Any) -> Optional[Dict[str, Any]]:
     # Backward compatibility for old field names.
     if "concrete_action" not in entry and "visible_action" in entry:
         entry["concrete_action"] = entry.get("visible_action", "")
-    if "latent_command" not in entry and "hidden_context" in entry:
-        entry["latent_command"] = entry.get("hidden_context", "")
+    if "seed_command" not in entry and "hidden_context" in entry:
+        entry["seed_command"] = entry.get("hidden_context", "")
 
     try:
         return InteractionLog.parse_obj(entry).dict()
@@ -240,30 +243,37 @@ def _normalize_existing_log_entry(entry: Any) -> Optional[Dict[str, Any]]:
 
 class MemorySystem:
     def __init__(self):
-        self.memories: List[MemoryItem] = []
+        # member_id -> List[MemoryItem]
+        self.memories: Dict[str, List[MemoryItem]] = {}
 
-    def add_memory(self, time: str, member_id: str, desc: str, shared_with: List[str]):
-        self.memories.append(MemoryItem(
-            time=time,
-            member_id=member_id,
-            description=desc,
-            decay_weight=1.0,
-            shared_with=shared_with
+    def add_memory(self, timestamp: str, member_id: str, log_type: str, content: str):
+        if member_id not in self.memories:
+            self.memories[member_id] = []
+        self.memories[member_id].append(MemoryItem(
+            timestamp=timestamp,
+            log_type=log_type,
+            content=content,
+            weight=1.0
         ))
+
+    def add_shared_memory(self, timestamp: str, log_type: str, content: str, shared_with: List[str]):
+        for m_id in shared_with:
+            self.add_memory(timestamp, m_id, log_type, content)
 
     def update_decay(self):
         # 1시간 루프 등 특정 시점에 호출되어 모든 메모리의 decay를 줄임
-        for m in self.memories:
-            m.decay_weight = max(0.3, round(m.decay_weight - 0.05, 2))
+        for mem_list in self.memories.values():
+            for m in mem_list:
+                m.weight = max(0.2, round(m.weight - 0.05, 2))
 
     def get_context_for_member(self, member_id: str) -> str:
-        my_mems = [m for m in self.memories if member_id in m.shared_with]
+        my_mems = self.memories.get(member_id, [])
         if not my_mems:
             return "관찰되는 다른 가족의 행동이나 최근 상황 없음."
         
-        my_mems.sort(key=lambda x: x.decay_weight, reverse=True)
+        my_mems.sort(key=lambda x: x.weight, reverse=True)
         # 상위 8개 정도 보여주기
-        lines = [f" - [{m.time}] {m.description} (기억가중치: {m.decay_weight})" for m in my_mems[:8]]
+        lines = [f" - [{m.timestamp}] [{m.log_type}] {m.content} (기억가중치: {m.weight})" for m in my_mems[:8]]
         return "\n".join(lines)
 
 
@@ -345,7 +355,12 @@ class SimulationEngine:
 
         # 메모리 기록도 별도 저장
         memory_out_path = self.log_path.parent / "memory_history.json"
-        _save_json(memory_out_path, [m.dict() for m in self.memory.memories])
+        
+        flat_memories = []
+        for v_id, m_list in self.memory.memories.items():
+            for m in m_list:
+                flat_memories.append({"member_id": v_id, **m.dict()})
+        _save_json(memory_out_path, flat_memories)
 
         return logs
 
@@ -373,10 +388,12 @@ class SimulationEngine:
                 hourly_activity=hourly_activity,
                 quarterly_activity=f"{hourly_activity} 진행 중" if skip_reason != "외출 중" else "외부 활동 중",
                 concrete_action="스마트홈 기기 조작 없음" if skip_reason != "외출 중" else "집 안에 없음",
-                latent_command="",
+                seed_command="",
                 shared_memory_refs=[mem_context],
-                interaction_with_context=None,
-                interaction_without_context=None
+                interaction_wc_vac=None,
+                interaction_wc_var=None,
+                interaction_woc_vac=None,
+                interaction_woc_var=None
             )
             return log.dict()
 
@@ -385,8 +402,8 @@ class SimulationEngine:
         
         # 2. 모든 15분 단위 행동은 메모리(상태 관찰 로그)에 무조건 저장
         shared_list = [m.member_id for m in self.family.members]
-        mem_desc = f"[{member.name}] {action_context.quarterly_activity}"
-        self.memory.add_memory(time, member.member_id, mem_desc, shared_list)
+        mem_desc = f"[{member.name}] {action_context.concrete_action}"
+        self.memory.add_shared_memory(time, "action", mem_desc, shared_list)
 
         if not action_context.needs_voice_command:
             print(f"⏭️ [SKIP] {time} {member.name}: {action_context.concrete_action} (명령 불필요)")
@@ -399,35 +416,48 @@ class SimulationEngine:
                 member_name=member.name,
                 member_role=member.role,
                 member_age=member.age,
-                location="집 안",
+                location=action_context.location,
                 hourly_activity=hourly_activity,
                 quarterly_activity=action_context.quarterly_activity,
                 concrete_action=action_context.concrete_action,
-                latent_command="",
+                seed_command=action_context.wc_command,
                 shared_memory_refs=[mem_context],
-                interaction_with_context=None,
-                interaction_without_context=None
+                interaction_wc_vac=None,
+                interaction_wc_var=None,
+                interaction_woc_vac=None,
+                interaction_woc_var=None
             )
             return log.dict()
 
-        print(f"🗣️ [ACT] {time} {member.name}: {action_context.concrete_action} (잠재: {action_context.latent_command})")
+        print(f"🗣️ [ACT] {time} {member.name}: {action_context.concrete_action} (잠재: {action_context.wc_command})")
 
-        # 3. 두 종류의 발화 생성 (With Context / Without Context)
-        cmd_with = self._generate_command(action_context.latent_command, action_context.concrete_action, include_context=True)
-        cmd_without = self._generate_command(action_context.latent_command, action_context.concrete_action, include_context=False)
+        # 3. Request Generation (With Context / Without Context)
+        cmd_with = action_context.wc_command
+        cmd_without = self._generate_woc_command(cmd_with, action_context.concrete_action)
 
         # VA 호출 자체도 메모리에 기록
-        self.memory.add_memory(time, member.member_id, f"[{member.name}] VA에게 '{cmd_with}'라고 음성 명령함", shared_list)
+        self.memory.add_shared_memory(time, "interaction", f"[{member.name}] VA에게 '{cmd_with}'라고 음성 명령함", shared_list)
 
-        # 4. 환경 상태를 보존하며 각각 실행
-        env_copy_without = Environment.parse_obj(self.environment.dict())
-        res_without, changes_without, desc_without = execute_command(cmd_without, env_copy_without, model=self.model_va)
+        # 4. 4-Cell Matrix Simulation
         
-        res_with, changes_with, desc_with = execute_command(cmd_with, self.environment, model=self.model_va)
+        # 1) WC x VA_C (Baseline, persists state)
+        res_wc_vac, changes_wc_vac, desc_wc_vac = va_c_execute(cmd_with, self.environment, model=self.model_va)
+        eval_wc_vac = self._self_evaluate(action_context.wc_command, cmd_with, res_wc_vac, changes_wc_vac, mem_context)
+        
+        # 2) WC x VA_R (Classifier, isolated)
+        env_copy_wc_var = Environment.parse_obj(self.environment.dict())
+        res_wc_var, changes_wc_var, desc_wc_var = va_r_execute(cmd_with, env_copy_wc_var)
+        eval_wc_var = self._self_evaluate(action_context.wc_command, cmd_with, res_wc_var, changes_wc_var, mem_context)
 
-        # 5. Self Evaluate
-        eval_with = self._self_evaluate(action_context.latent_command, cmd_with, res_with, changes_with)
-        eval_without = self._self_evaluate(action_context.latent_command, cmd_without, res_without, changes_without)
+        # 3) WOC x VA_C (Baseline, isolated)
+        env_copy_woc_vac = Environment.parse_obj(self.environment.dict())
+        res_woc_vac, changes_woc_vac, desc_woc_vac = va_c_execute(cmd_without, env_copy_woc_vac, model=self.model_va)
+        eval_woc_vac = self._self_evaluate(action_context.wc_command, cmd_without, res_woc_vac, changes_woc_vac, mem_context)
+        
+        # 4) WOC x VA_R (Classifier, isolated)
+        env_copy_woc_var = Environment.parse_obj(self.environment.dict())
+        res_woc_var, changes_woc_var, desc_woc_var = va_r_execute(cmd_without, env_copy_woc_var)
+        eval_woc_var = self._self_evaluate(action_context.wc_command, cmd_without, res_woc_var, changes_woc_var, mem_context)
 
         # 5. 메모리 업데이트(위에서 이미 처리 완료됨)
 
@@ -441,28 +471,44 @@ class SimulationEngine:
             member_name=member.name,
             member_role=member.role,
             member_age=member.age,
-            location="집 안",
+            location=action_context.location,
             hourly_activity=hourly_activity,
             quarterly_activity=action_context.quarterly_activity,
             concrete_action=action_context.concrete_action,
-            latent_command=action_context.latent_command,
+            seed_command=action_context.wc_command,
             shared_memory_refs=[mem_context],
-            interaction_with_context=InteractionResult(
+            interaction_wc_vac=InteractionResult(
                 command=cmd_with,
-                va_response=res_with,
-                state_changes=changes_with,
-                state_change_description=desc_with,
-                self_rating=eval_with.self_rating,
-                self_reason=eval_with.self_reason
+                va_response=res_wc_vac,
+                state_changes=changes_wc_vac,
+                state_change_description=desc_wc_vac,
+                self_rating=eval_wc_vac.self_rating,
+                self_reason=eval_wc_vac.self_reason,
             ),
-            interaction_without_context=InteractionResult(
+            interaction_wc_var=InteractionResult(
+                command=cmd_with,
+                va_response=res_wc_var,
+                state_changes=changes_wc_var,
+                state_change_description=desc_wc_var,
+                self_rating=eval_wc_var.self_rating,
+                self_reason=eval_wc_var.self_reason,
+            ),
+            interaction_woc_vac=InteractionResult(
                 command=cmd_without,
-                va_response=res_without,
-                state_changes=changes_without,
-                state_change_description=desc_without,
-                self_rating=eval_without.self_rating,
-                self_reason=eval_without.self_reason
-            )
+                va_response=res_woc_vac,
+                state_changes=changes_woc_vac,
+                state_change_description=desc_woc_vac,
+                self_rating=eval_woc_vac.self_rating,
+                self_reason=eval_woc_vac.self_reason,
+            ),
+            interaction_woc_var=InteractionResult(
+                command=cmd_without,
+                va_response=res_woc_var,
+                state_changes=changes_woc_var,
+                state_change_description=desc_woc_var,
+                self_rating=eval_woc_var.self_rating,
+                self_reason=eval_woc_var.self_reason,
+            ),
         )
 
         return log.dict()
@@ -471,34 +517,20 @@ class SimulationEngine:
         system_role = "당신은 한국어로 시뮬레이션 데이터를 생성합니다. 반드시 JSON만 출력하세요."
         
         family_members_str = ", ".join([f"{m.name}({m.role}, {m.age}세)" for m in self.family.members])
+        available_rooms = ", ".join(list(self.environment.rooms.keys()))
         
-        prompt = f"""
-        [가구원 정보 (주의: 이 구성원 외의 인물은 임의로 상상하지 마세요!)]
-        우리 가족 구성원: {family_members_str}
-
-        [상황 정보]
-        - 시간: {time} (이 시간의 15분 단위 행동을 묘사합니다)
-        - 1시간 대분류 활동: "{hourly_activity}"
-        - 현재 행동하는 사람: {member.name} ({member.role}, {member.age}세)
-        - 인물 소개(Bio): {member.bio}
-        
-        [현재 집 안의 관찰 가능한 다른 가족들의 상태 (Shared Memory)]
-        {mem_context}
-
-        요구 사항:
-        1) 'quarterly_activity': 1시간 대분류 활동 안에서, 이 특정 15분 동안 수행하는 구체적인 활동 요약입니다 (예: "아침 식사를 위해 계란 프라이 굽기").
-        2) 'concrete_action': 'quarterly_activity'에서 수행하는 행동을 사용자 입장에서 **시퀀스가 있는 구체적인 행동으로 최소 3문장 이상** 작성하세요. (장소 이동, 도구 사용, 기기 동작 등을 포함해 매우 상세히 묘사. 예: 거실에서 주방으로 걸어들어온다. 아침식사를 위해 냉장고에서 계란을 꺼낸다. 가스레인지를 켜고 프라이팬에 계란을 굽는다.)
-        3) 'latent_command': 이 행동을 진행하면서 스마트홈 환경(VA)에 실제로 요청하고 싶은 명령어(잠재 명령)를 나타냅니다. 속마음이 아닌 직접적인 명령문 형태여야 합니다 (예: 주방 후드 켜줘).
-        4) 'needs_voice_command' (True/False): 이 상황에서 스마트홈 VA(음성 인식 비서, IoT 제어 등)에게 명령을 내릴 확률이 있는지 여부.
-
-        출력 형식:
-        {{
-          "quarterly_activity": "간단히 요약된 15분 단위 활동명",
-          "concrete_action": "첫 번째 행동 문장입니다. 두 번째 이어지는 행동 묘사입니다. 세 번째 구체적인 도구 활용이나 상황 설명 문장입니다.",
-          "latent_command": "필요한 기기 제어 명령어",
-          "needs_voice_command": true
-        }}
-        """.strip()
+        prompt_template = Path("prompts/action_context.txt").read_text(encoding="utf-8")
+        prompt = prompt_template.format(
+            family_members_str=family_members_str,
+            time=time,
+            hourly_activity=hourly_activity,
+            name=member.name,
+            role=member.role,
+            age=member.age,
+            bio=member.bio,
+            mem_context=mem_context,
+            available_rooms=available_rooms
+        )
 
         try:
             data = query_llm(
@@ -514,24 +546,13 @@ class SimulationEngine:
             logger.warning("Action context fallback used at %s (%s): %s", time, member.name, exc)
             return _build_fallback_action_context(hourly_activity)
 
-    def _generate_command(self, latent_command: str, concrete_action: str, include_context: bool) -> str:
-        system_role = "당신은 한국어로 스마트홈 명령을 생성합니다. 반드시 JSON만 출력하세요."
-        
-        condition = f"잠재 명령: {latent_command}" if include_context else "상황 설명 없이, 잠재 명령의 핵심 기기 제어 요구만 짧게 재생성"
-
-        prompt = f"""
-        [상황]
-        - 현재 행동: {concrete_action}
-        - 참고 사항: {condition}
-
-        스마트홈 VA에게 할 자연스러운 한국어 명령을 만들어 주세요.
-        명령 생성 시 {'자신의 상황이나 이유를 구체적으로 포함하여 말하세요' if include_context else '상황 설명 없이 오직 기기 제어나 명령 내용만 짧게 말하세요'}.
-
-        출력 형식:
-        {{
-          "command": "거실 에어컨 켜줘"
-        }}
-        """.strip()
+    def _generate_woc_command(self, wc_command: str, concrete_action: str) -> str:
+        system_role = "당신은 한국어로 스마트홈 명령을 변환합니다. 반드시 JSON만 출력하세요."
+        prompt_template = Path("prompts/generate_command.txt").read_text(encoding="utf-8")
+        prompt = prompt_template.format(
+            concrete_action=concrete_action,
+            wc_command=wc_command
+        )
 
         try:
             data = query_llm(
@@ -544,26 +565,22 @@ class SimulationEngine:
             )
             return CommandOutput.parse_obj(data).command
         except (LLMError, Exception) as exc:  # noqa: BLE001 - fallback for pilot stability
-            logger.warning("Command fallback used for latent command '%s': %s", latent_command, exc)
-            if latent_command:
-                return latent_command
+            logger.warning("WOC Command fallback used for WC command '%s': %s", wc_command, exc)
+            if wc_command:
+                return wc_command
             return "거실 메인 조명 켜줘"
 
-    def _self_evaluate(self, latent_command: str, command: str, response: str, state_changes: List[StateChange]) -> SelfEvaluation:
+    def _self_evaluate(self, seed_command: str, command: str, response: str, state_changes: List[StateChange], mem_context: str) -> SelfEvaluation:
         system_role = "당신은 사용자 입장에서 만족도를 평가합니다. 반드시 JSON만 출력하세요."
         change_text = _format_state_changes(state_changes)
-        prompt = f"""
-        [상황] 사용자의 목적(잠재 명령): {latent_command}
-        [결과] 기기 변화: {change_text}
-        [대화] 나: "{command}" / VA: "{response}"
-
-        위 상황을 종합할 때, 스마트홈의 대응이 본인의 진짜 의도(잠재 명령)를 얼마나 잘 충족했습니까? (1-7점)
-        출력 형식:
-        {{
-          "self_rating": 7,
-          "self_reason": "이유"
-        }}
-        """.strip()
+        prompt_template = Path("prompts/self_evaluate.txt").read_text(encoding="utf-8")
+        prompt = prompt_template.format(
+            seed_command=seed_command,
+            change_text=change_text,
+            command=command,
+            response=response,
+            mem_context=mem_context
+        )
 
         try:
             data = query_llm(

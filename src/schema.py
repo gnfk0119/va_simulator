@@ -83,11 +83,10 @@ class GeneratedFamily(BaseModel):
 
 # --- Shared Memory ---
 class MemoryItem(BaseModel):
-    time: str
-    member_id: str
-    description: str
-    decay_weight: float = 1.0
-    shared_with: List[str] = Field(default_factory=list, description="이 기억을 공유받은 member_id 리스트")
+    timestamp: str
+    log_type: str = Field(..., description="action 또는 interaction")
+    content: str
+    weight: float = 1.0
 
     class Config:
         extra = "ignore"
@@ -96,8 +95,10 @@ class MemoryItem(BaseModel):
 # --- Phase 2: Action & Context ---
 class ActionContext(BaseModel):
     quarterly_activity: str = Field(..., description="15분 단위의 구체적인 활동 요약")
+    location: str = Field(..., description="현재 위치 (예: 거실, 안방, 집 밖 등)")
+    is_at_home: bool = Field(..., description="현재 인물이 집 안에 있는지 여부")
     concrete_action: str = Field(..., description="구체화된 3문장 이상의 순차적인 행동 묘사")
-    latent_command: str = Field(..., description="잠재 명령 - 현재 상황에서 VA에게 할 실제 명령어 (예: 조용히 안방 에어컨 틀어줘)")
+    wc_command: str = Field(..., description="명령 상황이나 맥락이 포함된 음성 명령 (예: 아이가 자니까 TV 볼륨 줄여줘)")
     needs_voice_command: bool = Field(
         ...,
         description=(
@@ -150,12 +151,14 @@ class InteractionLog(BaseModel):
     hourly_activity: str
     quarterly_activity: str
     concrete_action: str
-    latent_command: str
+    seed_command: str
     shared_memory_refs: List[str] = Field(default_factory=list)
 
-    # Interactions
-    interaction_with_context: Optional[InteractionResult] = None
-    interaction_without_context: Optional[InteractionResult] = None
+    # Interactions (4-cell Matrix)
+    interaction_wc_vac: Optional[InteractionResult] = None
+    interaction_wc_var: Optional[InteractionResult] = None
+    interaction_woc_vac: Optional[InteractionResult] = None
+    interaction_woc_var: Optional[InteractionResult] = None
 
     class Config:
         extra = "ignore"
