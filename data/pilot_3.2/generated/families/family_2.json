@@ -1,0 +1,1227 @@
+{
+  "family_id": "fam_001",
+  "members": [
+    {
+      "member_id": "m_01",
+      "name": "김철수",
+      "role": "아빠(가구주)",
+      "age": 45,
+      "economic_status": "재직중",
+      "monthly_income": "500만원 이상",
+      "bio": "김철수는 45세 직장인으로 평일에는 업무 중심의 생활을 한다. 퇴근 후에는 집안 전자기기를 직접 만지며 상태를 점검하는 편이다. 가족의 생활 리듬을 맞추기 위해 저녁 시간에는 주로 거실과 주방에서 시간을 보낸다. 조용하고 효율적인 환경을 선호해 기기 제어 명령을 자주 사용한다.",
+      "schedule": [
+        {
+          "time": "09-01 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 06:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 07:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 08:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 12:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 17:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 18:00",
+          "activity": "퇴근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 19:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 20:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 21:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 22:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 23:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 06:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 07:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 08:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 12:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 17:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 18:00",
+          "activity": "퇴근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 19:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 20:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 21:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 22:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 23:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 06:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 07:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 08:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 12:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 17:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 18:00",
+          "activity": "퇴근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 19:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 20:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 21:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 22:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 23:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 06:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 07:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 08:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 12:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 17:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 18:00",
+          "activity": "퇴근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 19:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 20:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 21:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 22:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 23:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 06:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 07:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 08:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 12:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 17:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 18:00",
+          "activity": "퇴근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 19:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 20:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 21:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 22:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 23:00",
+          "activity": "수면",
+          "is_at_home": true
+        }
+      ]
+    },
+    {
+      "member_id": "m_02",
+      "name": "이영희",
+      "role": "엄마(배우자)",
+      "age": 42,
+      "economic_status": "재직중",
+      "monthly_income": "300만원 이상",
+      "bio": "이영희는 42세로 일과 가사를 병행하며 하루 일정을 촘촘하게 운영한다. 주방과 세탁 공간에서 동시에 여러 작업을 처리하는 경우가 많다. 가족의 식사와 생활 편의를 챙기기 위해 시간대별로 집안 기기 사용 패턴이 뚜렷하다. 상황에 따라 조명과 주방 기기를 빠르게 제어하는 성향이 있다.",
+      "schedule": [
+        {
+          "time": "09-01 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 06:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 07:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 08:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 12:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 17:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 18:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 19:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 20:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 21:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 22:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 23:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 06:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 07:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 08:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 12:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 17:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-02 18:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 19:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 20:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 21:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 22:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-02 23:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 06:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 07:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 08:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 12:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 17:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-03 18:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 19:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 20:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 21:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 22:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-03 23:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 06:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 07:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 08:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 12:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 17:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-04 18:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 19:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 20:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 21:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 22:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-04 23:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 06:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 07:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 08:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 12:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 17:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-05 18:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 19:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 20:00",
+          "activity": "식사하기",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 21:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 22:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-05 23:00",
+          "activity": "수면",
+          "is_at_home": true
+        }
+      ]
+    }
+  ]
+}

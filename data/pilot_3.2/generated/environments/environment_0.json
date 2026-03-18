@@ -1,0 +1,320 @@
+{
+  "type_name": "A",
+  "rooms": {
+    "현관": [
+      {
+        "name": "현관 메인 조명",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "현관 스위치",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      }
+    ],
+    "내부 복도": [
+      {
+        "name": "내부 복도 메인 조명",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "내부 복도 스위치",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      }
+    ],
+    "거실": [
+      {
+        "name": "거실 메인 조명",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "거실 스위치",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "스탠드형 에어컨",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "스마트 TV",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "로봇청소기",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "월패드",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      }
+    ],
+    "주방/식당": [
+      {
+        "name": "주방/식당 메인 조명",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "주방/식당 스위치",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "냉장고",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "김치냉장고",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "전자레인지",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "식기세척기",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "주방 후드",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      }
+    ],
+    "침실1(안방)": [
+      {
+        "name": "침실1(안방) 메인 조명",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "침실1(안방) 스위치",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "벽걸이 에어컨",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "공기청정기",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      }
+    ],
+    "침실2": [
+      {
+        "name": "침실2 메인 조명",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "침실2 스위치",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "벽걸이 에어컨",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "공기청정기",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      }
+    ],
+    "침실3": [
+      {
+        "name": "침실3 메인 조명",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "침실3 스위치",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "벽걸이 에어컨",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "공기청정기",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      }
+    ],
+    "욕실(공용)": [
+      {
+        "name": "욕실(공용) 메인 조명",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "욕실(공용) 스위치",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      }
+    ],
+    "다용도/작업 공간": [
+      {
+        "name": "다용도/작업 공간 메인 조명",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      },
+      {
+        "name": "다용도/작업 공간 스위치",
+        "properties": {
+          "power": {
+            "state_value": "off",
+            "is_observable": true
+          }
+        }
+      }
+    ]
+  }
+}
