@@ -142,7 +142,7 @@ def export_to_excel(
                 if se is not None and te is not None:
                     try:
                         gap = int(se) - int(te)
-                        cls = "BG" if gap >= 2 else "SG"
+                        cls = "BG" if abs(gap) >= 2 else "SG"
                     except:
                         pass
                 

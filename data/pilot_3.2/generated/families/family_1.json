@@ -1,0 +1,267 @@
+{
+  "family_id": "fam_001",
+  "members": [
+    {
+      "member_id": "m_01",
+      "name": "김철수",
+      "role": "아빠(가구주)",
+      "age": 45,
+      "economic_status": "재직중",
+      "monthly_income": "500만원 이상",
+      "bio": "김철수는 45세 직장인으로 평일에는 업무 중심의 생활을 한다. 퇴근 후에는 집안 전자기기를 직접 만지며 상태를 점검하는 편이다. 가족의 생활 리듬을 맞추기 위해 저녁 시간에는 주로 거실과 주방에서 시간을 보낸다. 조용하고 효율적인 환경을 선호해 기기 제어 명령을 자주 사용한다.",
+      "schedule": [
+        {
+          "time": "09-01 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 06:00",
+          "activity": "기상 및 개인위생",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 07:00",
+          "activity": "출근 준비",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 08:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 09:00",
+          "activity": "업무 시작",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 10:00",
+          "activity": "업무",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 11:00",
+          "activity": "업무",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 12:00",
+          "activity": "점심 식사",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 13:00",
+          "activity": "업무 재개",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 14:00",
+          "activity": "업무",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 15:00",
+          "activity": "업무",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 16:00",
+          "activity": "업무",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 17:00",
+          "activity": "퇴근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 18:00",
+          "activity": "저녁 식사 및 가족과 대화",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 19:00",
+          "activity": "전자기기 상태 점검",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 20:00",
+          "activity": "실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 21:00",
+          "activity": "가족과 대화",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 22:00",
+          "activity": "휴식 및 기기 제어 명령",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 23:00",
+          "activity": "수면 준비 및 취침",
+          "is_at_home": true
+        }
+      ]
+    },
+    {
+      "member_id": "m_02",
+      "name": "이영희",
+      "role": "엄마(배우자)",
+      "age": 42,
+      "economic_status": "재직중",
+      "monthly_income": "300만원 이상",
+      "bio": "이영희는 42세로 일과 가사를 병행하며 하루 일정을 촘촘하게 운영한다. 주방과 세탁 공간에서 동시에 여러 작업을 처리하는 경우가 많다. 가족의 식사와 생활 편의를 챙기기 위해 시간대별로 집안 기기 사용 패턴이 뚜렷하다. 상황에 따라 조명과 주방 기기를 빠르게 제어하는 성향이 있다.",
+      "schedule": [
+        {
+          "time": "09-01 00:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 01:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 02:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 03:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 04:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 05:00",
+          "activity": "수면",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 06:00",
+          "activity": "개인위생 및 아침 식사 준비",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 07:00",
+          "activity": "기상 및 아침 식사 준비",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 08:00",
+          "activity": "출근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 09:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 10:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 11:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 12:00",
+          "activity": "점심 식사",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 13:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 14:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 15:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 16:00",
+          "activity": "(일) 회사원",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 17:00",
+          "activity": "퇴근",
+          "is_at_home": false
+        },
+        {
+          "time": "09-01 18:00",
+          "activity": "저녁 식사 준비 및 식사",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 19:00",
+          "activity": "식사 후 정리 및 설거지",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 20:00",
+          "activity": "가족과의 시간",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 21:00",
+          "activity": "개인 시간 및 실시간 방송 시청",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 22:00",
+          "activity": "휴식 및 개인위생",
+          "is_at_home": true
+        },
+        {
+          "time": "09-01 23:00",
+          "activity": "취침 준비 및 수면",
+          "is_at_home": true
+        }
+      ]
+    }
+  ]
+}
